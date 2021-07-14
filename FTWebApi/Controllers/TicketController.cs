@@ -55,10 +55,9 @@ namespace FTWebApi.Controllers
         {
             HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
           
-            //Check whether File exists.
+          
             if (!File.Exists(@filepath))
             {
-                //Throw 404 (Not Found) exception if File not found.
                 response.StatusCode = HttpStatusCode.NotFound;
                 response.ReasonPhrase = string.Format("File not found: {0} .", filname);
                 throw new HttpResponseException(response);
