@@ -1,0 +1,534 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="RCMQueryModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="BankMaster">
+          <Key>
+            <PropertyRef Name="Bank" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Bank" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Batch">
+          <Key>
+            <PropertyRef Name="BatchID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BatchID" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Date" Type="datetime" />
+          <Property Name="FromEmail" Type="varchar" MaxLength="50" />
+          <Property Name="EmailSubject" Type="varchar" MaxLength="500" />
+          <Property Name="EmailBody" Type="nvarchar(max)" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="acceptstatus" Type="varchar" MaxLength="50" />
+          <Property Name="oldbatchid" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="ErrorType">
+          <Key>
+            <PropertyRef Name="ErrorType" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ErrorType" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="querytype" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="KeyGen">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="varchar" MaxLength="100" />
+          <Property Name="srno" Type="varchar" MaxLength="50" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="LocationEmailHistory">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Ticketno" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="toemailid" Type="varchar" MaxLength="500" Nullable="false" />
+          <Property Name="emailsubject" Type="varchar" MaxLength="500" />
+          <Property Name="emailbody" Type="varchar(max)" />
+          <Property Name="emailsentdate" Type="datetime" />
+          <Property Name="ccemailid" Type="varchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="QueryTypeMaster">
+          <Key>
+            <PropertyRef Name="QueryType" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="QueryType" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Ticket">
+          <Key>
+            <PropertyRef Name="TicketID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="BatchID" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="TicketID" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ticketdate" Type="date" Nullable="false" />
+          <Property Name="tikcettime" Type="time" Precision="7" Nullable="false" />
+          <Property Name="tikcettype" Type="varchar" MaxLength="50" />
+          <Property Name="assignedto" Type="varchar" MaxLength="50" />
+          <Property Name="acceptstatus" Type="varchar" MaxLength="50" />
+          <Property Name="resolveddate" Type="datetime" />
+          <Property Name="customer" Type="varchar" MaxLength="50" />
+          <Property Name="pickupcode" Type="varchar" MaxLength="50" />
+          <Property Name="clientcode" Type="varchar" MaxLength="50" />
+          <Property Name="crnno" Type="varchar" MaxLength="50" />
+          <Property Name="client" Type="varchar" MaxLength="50" />
+          <Property Name="area" Type="varchar" MaxLength="50" />
+          <Property Name="cdpncm" Type="varchar" MaxLength="50" />
+          <Property Name="region" Type="varchar" MaxLength="50" />
+          <Property Name="location" Type="varchar" MaxLength="50" />
+          <Property Name="hublocation" Type="varchar" MaxLength="50" />
+          <Property Name="problem" Type="varchar" MaxLength="500" />
+          <Property Name="mistakedoneby" Type="varchar" MaxLength="50" />
+          <Property Name="errortype" Type="varchar" MaxLength="50" />
+          <Property Name="querystatus" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="customertype" Type="varchar" MaxLength="50" />
+          <Property Name="hierarchycode" Type="varchar" MaxLength="50" />
+          <Property Name="filepath" Type="varchar(max)" />
+          <Property Name="filename" Type="varchar" MaxLength="50" />
+          <Property Name="rejectremark" Type="varchar" MaxLength="500" />
+        </EntityType>
+        <EntityType Name="TicketDetails">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="TicketID" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="pickupdate" Type="date" />
+          <Property Name="pickupcode" Type="varchar" MaxLength="50" />
+          <Property Name="clientcode" Type="varchar" MaxLength="50" />
+          <Property Name="crnno" Type="varchar" MaxLength="50" />
+          <Property Name="customeruniquecode" Type="varchar" MaxLength="50" />
+          <Property Name="wronghcin" Type="varchar" MaxLength="50" />
+          <Property Name="actualhcin" Type="varchar" MaxLength="50" />
+          <Property Name="wrongdispis" Type="varchar" MaxLength="50" />
+          <Property Name="actualdispis" Type="varchar" MaxLength="50" />
+          <Property Name="wrongamt" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="actualamt" Type="decimal" Precision="10" Scale="2" />
+          <Property Name="wrongpickupcode" Type="varchar" MaxLength="50" />
+          <Property Name="wrongclientcode" Type="varchar" MaxLength="50" />
+          <Property Name="wrongcustomeruniquecode" Type="varchar" MaxLength="50" />
+          <Property Name="depostiondate" Type="date" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="soleid" Type="varchar" MaxLength="50" />
+          <Property Name="bankbranchlocation" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="userbankmap">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Userid" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Bank" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="QueryType" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="UserPriority" Type="char" MaxLength="1" Nullable="false" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="usermaster">
+          <Key>
+            <PropertyRef Name="Userid" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Userid" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="UserName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="UserPassword" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="UserRole" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+        </EntityType>
+        <EntityContainer Name="RCMQueryModelStoreContainer">
+          <EntitySet Name="BankMaster" EntityType="Self.BankMaster" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Batch" EntityType="Self.Batch" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ErrorType" EntityType="Self.ErrorType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="KeyGen" EntityType="Self.KeyGen" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LocationEmailHistory" EntityType="Self.LocationEmailHistory" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="QueryTypeMaster" EntityType="Self.QueryTypeMaster" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Ticket" EntityType="Self.Ticket" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TicketDetails" EntityType="Self.TicketDetails" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="userbankmap" EntityType="Self.userbankmap" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="usermaster" EntityType="Self.usermaster" Schema="dbo" store:Type="Tables" />
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="RCMQueryModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Batch">
+          <Key>
+            <PropertyRef Name="BatchID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BatchID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Date" Type="DateTime" Precision="3" />
+          <Property Name="FromEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="EmailSubject" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="EmailBody" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="acceptstatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="oldbatchid" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ErrorType">
+          <Key>
+            <PropertyRef Name="ErrorType1" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ErrorType1" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="querytype" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="KeyGen">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="srno" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyCode" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Ticket">
+          <Key>
+            <PropertyRef Name="TicketID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BatchID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TicketID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ticketdate" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="tikcettime" Type="Time" Nullable="false" Precision="7" />
+          <Property Name="tikcettype" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="assignedto" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="acceptstatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="resolveddate" Type="DateTime" Precision="3" />
+          <Property Name="customer" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="pickupcode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="clientcode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="crnno" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="client" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="area" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="cdpncm" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="region" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="location" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="hublocation" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="problem" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="mistakedoneby" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="errortype" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="querystatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="customertype" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="hierarchycode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="filepath" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="filename" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="rejectremark" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="TicketDetail">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="TicketID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="pickupdate" Type="DateTime" Precision="0" />
+          <Property Name="pickupcode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="clientcode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="crnno" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="customeruniquecode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="wronghcin" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="actualhcin" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="wrongdispis" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="actualdispis" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="wrongamt" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="actualamt" Type="Decimal" Precision="10" Scale="2" />
+          <Property Name="wrongpickupcode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="wrongclientcode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="wrongcustomeruniquecode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="depostiondate" Type="DateTime" Precision="0" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="soleid" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="bankbranchlocation" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityContainer Name="TMSEntitiesnew" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Batches" EntityType="Self.Batch" />
+          <EntitySet Name="ErrorTypes" EntityType="Self.ErrorType" />
+          <EntitySet Name="KeyGens" EntityType="Self.KeyGen" />
+          <EntitySet Name="Tickets" EntityType="Self.Ticket" />
+          <EntitySet Name="TicketDetails" EntityType="Self.TicketDetail" />
+          <EntitySet Name="BankMasters" EntityType="RCMQueryModel.BankMaster" />
+          <EntitySet Name="QueryTypeMasters" EntityType="RCMQueryModel.QueryTypeMaster" />
+          <EntitySet Name="userbankmaps" EntityType="RCMQueryModel.userbankmap" />
+          <EntitySet Name="usermasters" EntityType="RCMQueryModel.usermaster" />
+          <EntitySet Name="LocationEmailHistories" EntityType="RCMQueryModel.LocationEmailHistory" />
+        </EntityContainer>
+        <EntityType Name="BankMaster">
+          <Key>
+            <PropertyRef Name="Bank" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Bank" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="QueryTypeMaster">
+          <Key>
+            <PropertyRef Name="QueryType" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="QueryType" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="userbankmap">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Userid" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Bank" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="QueryType" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="UserPriority" Type="String" Nullable="false" MaxLength="1" FixedLength="true" Unicode="false" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="usermaster">
+          <Key>
+            <PropertyRef Name="Userid" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Userid" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="UserName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="UserPassword" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="UserRole" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="LocationEmailHistory">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Ticketno" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="toemailid" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="emailsubject" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="emailbody" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="emailsentdate" Type="DateTime" Precision="3" />
+          <Property Name="ccemailid" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+        </EntityType>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="RCMQueryModelStoreContainer" CdmEntityContainer="TMSEntitiesnew">
+          <EntitySetMapping Name="Batches">
+            <EntityTypeMapping TypeName="RCMQueryModel.Batch">
+              <MappingFragment StoreEntitySet="Batch">
+                <ScalarProperty Name="oldbatchid" ColumnName="oldbatchid" />
+                <ScalarProperty Name="acceptstatus" ColumnName="acceptstatus" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="BatchID" ColumnName="BatchID" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="FromEmail" ColumnName="FromEmail" />
+                <ScalarProperty Name="EmailSubject" ColumnName="EmailSubject" />
+                <ScalarProperty Name="EmailBody" ColumnName="EmailBody" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ErrorTypes">
+            <EntityTypeMapping TypeName="RCMQueryModel.ErrorType">
+              <MappingFragment StoreEntitySet="ErrorType">
+                <ScalarProperty Name="querytype" ColumnName="querytype" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ErrorType1" ColumnName="ErrorType" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="KeyGens">
+            <EntityTypeMapping TypeName="RCMQueryModel.KeyGen">
+              <MappingFragment StoreEntitySet="KeyGen">
+                <ScalarProperty Name="id" ColumnName="id" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
+                <ScalarProperty Name="srno" ColumnName="srno" />
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Tickets">
+            <EntityTypeMapping TypeName="RCMQueryModel.Ticket">
+              <MappingFragment StoreEntitySet="Ticket">
+                <ScalarProperty Name="rejectremark" ColumnName="rejectremark" />
+                <ScalarProperty Name="filename" ColumnName="filename" />
+                <ScalarProperty Name="filepath" ColumnName="filepath" />
+                <ScalarProperty Name="hierarchycode" ColumnName="hierarchycode" />
+                <ScalarProperty Name="customertype" ColumnName="customertype" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="BatchID" ColumnName="BatchID" />
+                <ScalarProperty Name="TicketID" ColumnName="TicketID" />
+                <ScalarProperty Name="ticketdate" ColumnName="ticketdate" />
+                <ScalarProperty Name="tikcettime" ColumnName="tikcettime" />
+                <ScalarProperty Name="tikcettype" ColumnName="tikcettype" />
+                <ScalarProperty Name="assignedto" ColumnName="assignedto" />
+                <ScalarProperty Name="acceptstatus" ColumnName="acceptstatus" />
+                <ScalarProperty Name="resolveddate" ColumnName="resolveddate" />
+                <ScalarProperty Name="customer" ColumnName="customer" />
+                <ScalarProperty Name="pickupcode" ColumnName="pickupcode" />
+                <ScalarProperty Name="clientcode" ColumnName="clientcode" />
+                <ScalarProperty Name="crnno" ColumnName="crnno" />
+                <ScalarProperty Name="client" ColumnName="client" />
+                <ScalarProperty Name="area" ColumnName="area" />
+                <ScalarProperty Name="cdpncm" ColumnName="cdpncm" />
+                <ScalarProperty Name="region" ColumnName="region" />
+                <ScalarProperty Name="location" ColumnName="location" />
+                <ScalarProperty Name="hublocation" ColumnName="hublocation" />
+                <ScalarProperty Name="problem" ColumnName="problem" />
+                <ScalarProperty Name="mistakedoneby" ColumnName="mistakedoneby" />
+                <ScalarProperty Name="errortype" ColumnName="errortype" />
+                <ScalarProperty Name="querystatus" ColumnName="querystatus" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TicketDetails">
+            <EntityTypeMapping TypeName="RCMQueryModel.TicketDetail">
+              <MappingFragment StoreEntitySet="TicketDetails">
+                <ScalarProperty Name="bankbranchlocation" ColumnName="bankbranchlocation" />
+                <ScalarProperty Name="soleid" ColumnName="soleid" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="TicketID" ColumnName="TicketID" />
+                <ScalarProperty Name="pickupdate" ColumnName="pickupdate" />
+                <ScalarProperty Name="pickupcode" ColumnName="pickupcode" />
+                <ScalarProperty Name="clientcode" ColumnName="clientcode" />
+                <ScalarProperty Name="crnno" ColumnName="crnno" />
+                <ScalarProperty Name="customeruniquecode" ColumnName="customeruniquecode" />
+                <ScalarProperty Name="wronghcin" ColumnName="wronghcin" />
+                <ScalarProperty Name="actualhcin" ColumnName="actualhcin" />
+                <ScalarProperty Name="wrongdispis" ColumnName="wrongdispis" />
+                <ScalarProperty Name="actualdispis" ColumnName="actualdispis" />
+                <ScalarProperty Name="wrongamt" ColumnName="wrongamt" />
+                <ScalarProperty Name="actualamt" ColumnName="actualamt" />
+                <ScalarProperty Name="wrongpickupcode" ColumnName="wrongpickupcode" />
+                <ScalarProperty Name="wrongclientcode" ColumnName="wrongclientcode" />
+                <ScalarProperty Name="wrongcustomeruniquecode" ColumnName="wrongcustomeruniquecode" />
+                <ScalarProperty Name="depostiondate" ColumnName="depostiondate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BankMasters">
+            <EntityTypeMapping TypeName="RCMQueryModel.BankMaster">
+              <MappingFragment StoreEntitySet="BankMaster">
+                <ScalarProperty Name="Bank" ColumnName="Bank" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="QueryTypeMasters">
+            <EntityTypeMapping TypeName="RCMQueryModel.QueryTypeMaster">
+              <MappingFragment StoreEntitySet="QueryTypeMaster">
+                <ScalarProperty Name="QueryType" ColumnName="QueryType" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="userbankmaps">
+            <EntityTypeMapping TypeName="RCMQueryModel.userbankmap">
+              <MappingFragment StoreEntitySet="userbankmap">
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="UserPriority" ColumnName="UserPriority" />
+                <ScalarProperty Name="QueryType" ColumnName="QueryType" />
+                <ScalarProperty Name="Bank" ColumnName="Bank" />
+                <ScalarProperty Name="Userid" ColumnName="Userid" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="usermasters">
+            <EntityTypeMapping TypeName="RCMQueryModel.usermaster">
+              <MappingFragment StoreEntitySet="usermaster">
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="UserRole" ColumnName="UserRole" />
+                <ScalarProperty Name="UserPassword" ColumnName="UserPassword" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="Userid" ColumnName="Userid" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LocationEmailHistories">
+            <EntityTypeMapping TypeName="RCMQueryModel.LocationEmailHistory">
+              <MappingFragment StoreEntitySet="LocationEmailHistory">
+                <ScalarProperty Name="ccemailid" ColumnName="ccemailid" />
+                <ScalarProperty Name="emailsentdate" ColumnName="emailsentdate" />
+                <ScalarProperty Name="emailbody" ColumnName="emailbody" />
+                <ScalarProperty Name="emailsubject" ColumnName="emailsubject" />
+                <ScalarProperty Name="toemailid" ColumnName="toemailid" />
+                <ScalarProperty Name="Ticketno" ColumnName="Ticketno" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

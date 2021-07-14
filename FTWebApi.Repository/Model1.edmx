@@ -1,0 +1,1014 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="RCMModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ClientAccountMaster">
+          <Key>
+            <PropertyRef Name="ClientCode" />
+            <PropertyRef Name="AccountId" />
+          </Key>
+          <Property Name="ClientCode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="AccountId" Type="varchar" MaxLength="20" Nullable="false" />
+          <Property Name="AccountName" Type="varchar" MaxLength="20" />
+          <Property Name="RefName" Type="varchar" MaxLength="20" />
+          <Property Name="CustomerUniqueId" Type="varchar" MaxLength="20" />
+          <Property Name="CancelFlag" Type="bit" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="10" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="10" />
+        </EntityType>
+        <!--Errors Found During Generation:
+warning 6002: The table/view 'RCMProdDB.dbo.ClientCustAccountMaster' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+        <EntityType Name="ClientCustAccountMaster">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="ClientCustCode" />
+            <PropertyRef Name="AccountId" />
+            <PropertyRef Name="CreatedBy" />
+            <PropertyRef Name="CreatedDate" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClientCustCode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="AccountId" Type="varchar" MaxLength="30" Nullable="false" />
+          <Property Name="AccountName" Type="varchar" MaxLength="50" />
+          <Property Name="CustomerUniqueId" Type="varchar" MaxLength="50" />
+          <Property Name="PickupCode" Type="varchar" MaxLength="50" />
+          <Property Name="StoreCode" Type="varchar" MaxLength="50" />
+          <Property Name="HierarchyCode" Type="varchar" MaxLength="50" />
+          <Property Name="DivisionCode" Type="varchar" MaxLength="50" />
+          <Property Name="SubDivisionCode" Type="varchar" MaxLength="50" />
+          <Property Name="SubCode" Type="varchar" MaxLength="50" />
+          <Property Name="CustomerDeptCode" Type="varchar" MaxLength="50" />
+          <Property Name="CashLimit" Type="decimal" Precision="18" Scale="2" />
+          <Property Name="ClientCode" Type="varchar" MaxLength="50" />
+          <Property Name="CancelFlag" Type="bit" />
+          <Property Name="OtherDetail1" Type="varchar" MaxLength="50" />
+          <Property Name="OtherDetail2" Type="varchar" MaxLength="50" />
+          <Property Name="OtherDetail3" Type="varchar" MaxLength="50" />
+          <Property Name="OtherDetail4" Type="varchar" MaxLength="50" />
+          <Property Name="OtherDetail5" Type="varchar" MaxLength="50" />
+          <Property Name="OtherDetail6" Type="varchar" MaxLength="50" />
+          <Property Name="OtherDetail7" Type="varchar" MaxLength="50" />
+          <Property Name="OtherDetail8" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="10" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="10" />
+          <Property Name="StartDate" Type="datetime" />
+          <Property Name="EndDate" Type="datetime" />
+        </EntityType>
+        <EntityType Name="ClientCustBankDetails">
+          <Key>
+            <PropertyRef Name="ClientCustCode" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClientCustCode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="BusinessBank" Type="varchar" MaxLength="50" />
+          <Property Name="BillingBank" Type="varchar" MaxLength="50" />
+          <Property Name="DepositionBank" Type="varchar" MaxLength="50" />
+          <Property Name="DepositionType" Type="varchar" MaxLength="50" />
+          <Property Name="BusinessBankAddress" Type="varchar" MaxLength="500" />
+          <Property Name="BillingBankAddress" Type="varchar" MaxLength="500" />
+          <Property Name="DepositionBankAddress" Type="varchar" MaxLength="500" />
+          <Property Name="BusinessBankSolid" Type="varchar" MaxLength="50" />
+          <Property Name="BillingBankSolid" Type="varchar" MaxLength="50" />
+          <Property Name="DepositionBankSolid" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="ModifyBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifyDate" Type="datetime" />
+          <Property Name="CDPPullingARG" Type="varchar" MaxLength="50" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="ClientCustMaster">
+          <Key>
+            <PropertyRef Name="ClientCustCode" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClientCustCode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="OldReferenceCode" Type="varchar" MaxLength="50" />
+          <Property Name="ClientCustName" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="StartDate" Type="datetime" Nullable="false" />
+          <Property Name="EndDate" Type="datetime" />
+          <Property Name="LOIStartDate" Type="datetime" />
+          <Property Name="AccountType" Type="varchar" MaxLength="50" />
+          <Property Name="DepartmentID" Type="varchar" MaxLength="50" />
+          <Property Name="Regioncode" Type="varchar" MaxLength="50" />
+          <Property Name="LocationCode" Type="varchar" MaxLength="50" />
+          <Property Name="HubLocationCode" Type="varchar" MaxLength="50" />
+          <Property Name="SubLocationCode" Type="varchar" MaxLength="50" />
+          <Property Name="CityCode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CustomerBranchCode" Type="varchar" MaxLength="50" />
+          <Property Name="AreaCode" Type="varchar" MaxLength="50" />
+          <Property Name="CustomerCode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="PickPointCode" Type="varchar" MaxLength="50" />
+          <Property Name="CityLimitType" Type="varchar" MaxLength="50" />
+          <Property Name="FarBCLkm" Type="int" />
+          <Property Name="MatchRequestAmount" Type="bit" />
+          <Property Name="SpecailDeal" Type="bit" />
+          <Property Name="PutOnHold" Type="bit" />
+          <Property Name="CancelFlag" Type="bit" />
+          <Property Name="Remarks" Type="varchar" MaxLength="500" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ClientNameAsPerLOI" Type="varchar" MaxLength="50" />
+          <Property Name="PickupStatus" Type="varchar" MaxLength="20" />
+          <Property Name="SolId" Type="varchar" MaxLength="50" />
+          <Property Name="LandMark" Type="varchar" MaxLength="50" />
+          <Property Name="MaxCashLimit" Type="numeric" Precision="18" Scale="0" />
+          <Property Name="AuthStatus" Type="varchar" MaxLength="50" />
+          <Property Name="RejectRemarks" Type="varchar" MaxLength="500" />
+          <Property Name="RejectedBy" Type="varchar" MaxLength="50" />
+          <Property Name="RejectedDate" Type="datetime" />
+          <Property Name="IsActive" Type="int" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="50" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="CMSCashLimit" Type="numeric" Precision="18" Scale="2" />
+          <Property Name="Longitude" Type="nvarchar" MaxLength="50" />
+          <Property Name="Latitude" Type="nvarchar" MaxLength="50" />
+          <Property Name="BusinessCityCode" Type="varchar" MaxLength="50" />
+          <Property Name="BaseCityCode" Type="varchar" MaxLength="50" />
+          <Property Name="NewZoneCode" Type="varchar" MaxLength="80" />
+          <Property Name="AuthorizedDate" Type="datetime" />
+          <Property Name="AuthorizedBy" Type="varchar" MaxLength="80" />
+          <Property Name="flagScanAmount" Type="bit" />
+        </EntityType>
+        <EntityType Name="CustomerMaster">
+          <Key>
+            <PropertyRef Name="CustomerCode" />
+            <PropertyRef Name="CompanyCode" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="CustomerCode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CustomerName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="Nationality" Type="varchar" MaxLength="100" />
+          <Property Name="Address" Type="nvarchar(max)" />
+          <Property Name="PinCode" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Telno" Type="varchar" MaxLength="100" />
+          <Property Name="Mobileno" Type="varchar" MaxLength="100" />
+          <Property Name="Faxno" Type="varchar" MaxLength="100" />
+          <Property Name="EmailId" Type="nvarchar" MaxLength="200" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="StartDate" Type="datetime" />
+          <Property Name="EndDate" Type="datetime" />
+          <Property Name="VaultLimit" Type="bigint" />
+          <Property Name="CustomerRemarks" Type="varchar" MaxLength="100" />
+          <Property Name="IsActive" Type="int" Nullable="false" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="CreatedDate" Type="datetime" Nullable="false" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="10" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="CustType" Type="varchar" MaxLength="50" />
+          <Property Name="AuthorizeDate" Type="datetime" />
+          <Property Name="RejectRemarks" Type="varchar" MaxLength="500" />
+          <Property Name="RejectedBy" Type="varchar" MaxLength="50" />
+          <Property Name="RejectedDate" Type="datetime" />
+          <Property Name="CustAuthStatus" Type="varchar" MaxLength="50" />
+          <Property Name="ImagePath" Type="varchar" MaxLength="500" />
+          <Property Name="ImageMapperID" Type="int" />
+          <Property Name="Priority_Id" Type="int" Nullable="false" />
+          <Property Name="BankClosureTime" Type="time" Precision="7" />
+        </EntityType>
+        <EntityType Name="HublocationMast">
+          <Key>
+            <PropertyRef Name="hublocationcode" />
+            <PropertyRef Name="CompanyCode" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="hublocationname" Type="varchar" MaxLength="50" />
+          <Property Name="hublocationcode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="locationcode" Type="varchar" MaxLength="50" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="StateCode" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="LocationMast">
+          <Key>
+            <PropertyRef Name="locationcode" />
+            <PropertyRef Name="CompanyCode" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="locationname" Type="varchar" MaxLength="50" />
+          <Property Name="locationcode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="regioncode" Type="varchar" MaxLength="50" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="LocationMaster">
+          <Key>
+            <PropertyRef Name="LocationCode" />
+            <PropertyRef Name="CompanyCode" />
+            <PropertyRef Name="sublocationcode" />
+          </Key>
+          <Property Name="LocationCode" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="LocationName" Type="varchar" MaxLength="50" />
+          <Property Name="regioncode" Type="varchar" MaxLength="50" />
+          <Property Name="loccode" Type="varchar" MaxLength="50" />
+          <Property Name="hublocationcode" Type="varchar" MaxLength="50" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="CreatedBy" Type="varchar" MaxLength="10" />
+          <Property Name="CreatedDate" Type="datetime" />
+          <Property Name="ModifiedBy" Type="varchar" MaxLength="10" />
+          <Property Name="ModifiedDate" Type="datetime" />
+          <Property Name="sublocationcode" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RegionMast">
+          <Key>
+            <PropertyRef Name="regioncode" />
+            <PropertyRef Name="CompanyCode" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="regionname" Type="varchar" MaxLength="50" />
+          <Property Name="regioncode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="ZoneCode" Type="varchar" MaxLength="50" />
+        </EntityType>
+        <EntityType Name="SubLocationMast">
+          <Key>
+            <PropertyRef Name="sublocationcode" />
+            <PropertyRef Name="CompanyCode" />
+          </Key>
+          <Property Name="id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="sublocationname" Type="varchar" MaxLength="50" />
+          <Property Name="sublocationcode" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="hublocationcode" Type="varchar" MaxLength="50" />
+          <Property Name="CompanyCode" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <Association Name="fk_CCD_ClientCustCode">
+          <End Role="ClientCustMaster" Type="Self.ClientCustMaster" Multiplicity="1" />
+          <End Role="ClientCustBankDetails" Type="Self.ClientCustBankDetails" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ClientCustMaster">
+              <PropertyRef Name="ClientCustCode" />
+            </Principal>
+            <Dependent Role="ClientCustBankDetails">
+              <PropertyRef Name="ClientCustCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_CCM_LCM">
+          <End Role="LocationMast" Type="Self.LocationMast" Multiplicity="0..1" />
+          <End Role="HublocationMast" Type="Self.HublocationMast" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LocationMast">
+              <PropertyRef Name="locationcode" />
+              <PropertyRef Name="CompanyCode" />
+            </Principal>
+            <Dependent Role="HublocationMast">
+              <PropertyRef Name="locationcode" />
+              <PropertyRef Name="CompanyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_CCM_RGM">
+          <End Role="RegionMast" Type="Self.RegionMast" Multiplicity="0..1" />
+          <End Role="LocationMast" Type="Self.LocationMast" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RegionMast">
+              <PropertyRef Name="regioncode" />
+              <PropertyRef Name="CompanyCode" />
+            </Principal>
+            <Dependent Role="LocationMast">
+              <PropertyRef Name="regioncode" />
+              <PropertyRef Name="CompanyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_CCM_SUB">
+          <End Role="SubLocationMast" Type="Self.SubLocationMast" Multiplicity="0..1" />
+          <End Role="ClientCustMaster" Type="Self.ClientCustMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SubLocationMast">
+              <PropertyRef Name="sublocationcode" />
+              <PropertyRef Name="CompanyCode" />
+            </Principal>
+            <Dependent Role="ClientCustMaster">
+              <PropertyRef Name="SubLocationCode" />
+              <PropertyRef Name="CompanyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_CCM_SUBM">
+          <End Role="HublocationMast" Type="Self.HublocationMast" Multiplicity="0..1" />
+          <End Role="SubLocationMast" Type="Self.SubLocationMast" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="HublocationMast">
+              <PropertyRef Name="hublocationcode" />
+              <PropertyRef Name="CompanyCode" />
+            </Principal>
+            <Dependent Role="SubLocationMast">
+              <PropertyRef Name="hublocationcode" />
+              <PropertyRef Name="CompanyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_ClientCustCode">
+          <End Role="ClientCustMaster" Type="Self.ClientCustMaster" Multiplicity="1" />
+          <End Role="ClientCustAccountMaster" Type="Self.ClientCustAccountMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientCustMaster">
+              <PropertyRef Name="ClientCustCode" />
+            </Principal>
+            <Dependent Role="ClientCustAccountMaster">
+              <PropertyRef Name="ClientCustCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="RCMModelStoreContainer">
+          <EntitySet Name="ClientAccountMaster" EntityType="Self.ClientAccountMaster" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ClientCustBankDetails" EntityType="Self.ClientCustBankDetails" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ClientCustMaster" EntityType="Self.ClientCustMaster" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="CustomerMaster" EntityType="Self.CustomerMaster" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="HublocationMast" EntityType="Self.HublocationMast" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LocationMast" EntityType="Self.LocationMast" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="LocationMaster" EntityType="Self.LocationMaster" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RegionMast" EntityType="Self.RegionMast" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="SubLocationMast" EntityType="Self.SubLocationMast" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ClientCustAccountMaster" EntityType="Self.ClientCustAccountMaster" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [ClientCustAccountMaster].[ID] AS [ID], 
+    [ClientCustAccountMaster].[ClientCustCode] AS [ClientCustCode], 
+    [ClientCustAccountMaster].[AccountId] AS [AccountId], 
+    [ClientCustAccountMaster].[AccountName] AS [AccountName], 
+    [ClientCustAccountMaster].[CustomerUniqueId] AS [CustomerUniqueId], 
+    [ClientCustAccountMaster].[PickupCode] AS [PickupCode], 
+    [ClientCustAccountMaster].[StoreCode] AS [StoreCode], 
+    [ClientCustAccountMaster].[HierarchyCode] AS [HierarchyCode], 
+    [ClientCustAccountMaster].[DivisionCode] AS [DivisionCode], 
+    [ClientCustAccountMaster].[SubDivisionCode] AS [SubDivisionCode], 
+    [ClientCustAccountMaster].[SubCode] AS [SubCode], 
+    [ClientCustAccountMaster].[CustomerDeptCode] AS [CustomerDeptCode], 
+    [ClientCustAccountMaster].[CashLimit] AS [CashLimit], 
+    [ClientCustAccountMaster].[ClientCode] AS [ClientCode], 
+    [ClientCustAccountMaster].[CancelFlag] AS [CancelFlag], 
+    [ClientCustAccountMaster].[OtherDetail1] AS [OtherDetail1], 
+    [ClientCustAccountMaster].[OtherDetail2] AS [OtherDetail2], 
+    [ClientCustAccountMaster].[OtherDetail3] AS [OtherDetail3], 
+    [ClientCustAccountMaster].[OtherDetail4] AS [OtherDetail4], 
+    [ClientCustAccountMaster].[OtherDetail5] AS [OtherDetail5], 
+    [ClientCustAccountMaster].[OtherDetail6] AS [OtherDetail6], 
+    [ClientCustAccountMaster].[OtherDetail7] AS [OtherDetail7], 
+    [ClientCustAccountMaster].[OtherDetail8] AS [OtherDetail8], 
+    [ClientCustAccountMaster].[CreatedBy] AS [CreatedBy], 
+    [ClientCustAccountMaster].[CreatedDate] AS [CreatedDate], 
+    [ClientCustAccountMaster].[ModifiedBy] AS [ModifiedBy], 
+    [ClientCustAccountMaster].[ModifiedDate] AS [ModifiedDate], 
+    [ClientCustAccountMaster].[CompanyCode] AS [CompanyCode], 
+    [ClientCustAccountMaster].[StartDate] AS [StartDate], 
+    [ClientCustAccountMaster].[EndDate] AS [EndDate]
+    FROM [dbo].[ClientCustAccountMaster] AS [ClientCustAccountMaster]</DefiningQuery>
+          </EntitySet>
+          <AssociationSet Name="fk_CCD_ClientCustCode" Association="Self.fk_CCD_ClientCustCode">
+            <End Role="ClientCustMaster" EntitySet="ClientCustMaster" />
+            <End Role="ClientCustBankDetails" EntitySet="ClientCustBankDetails" />
+          </AssociationSet>
+          <AssociationSet Name="fk_CCM_LCM" Association="Self.fk_CCM_LCM">
+            <End Role="LocationMast" EntitySet="LocationMast" />
+            <End Role="HublocationMast" EntitySet="HublocationMast" />
+          </AssociationSet>
+          <AssociationSet Name="fk_CCM_RGM" Association="Self.fk_CCM_RGM">
+            <End Role="RegionMast" EntitySet="RegionMast" />
+            <End Role="LocationMast" EntitySet="LocationMast" />
+          </AssociationSet>
+          <AssociationSet Name="fk_CCM_SUB" Association="Self.fk_CCM_SUB">
+            <End Role="SubLocationMast" EntitySet="SubLocationMast" />
+            <End Role="ClientCustMaster" EntitySet="ClientCustMaster" />
+          </AssociationSet>
+          <AssociationSet Name="fk_CCM_SUBM" Association="Self.fk_CCM_SUBM">
+            <End Role="HublocationMast" EntitySet="HublocationMast" />
+            <End Role="SubLocationMast" EntitySet="SubLocationMast" />
+          </AssociationSet>
+          <AssociationSet Name="fk_ClientCustCode" Association="Self.fk_ClientCustCode">
+            <End Role="ClientCustMaster" EntitySet="ClientCustMaster" />
+            <End Role="ClientCustAccountMaster" EntitySet="ClientCustAccountMaster" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="RCMModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="ClientCustMaster">
+          <Key>
+            <PropertyRef Name="ClientCustCode" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientCustCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="OldReferenceCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ClientCustName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="StartDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Precision="3" />
+          <Property Name="LOIStartDate" Type="DateTime" Precision="3" />
+          <Property Name="AccountType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DepartmentID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Regioncode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LocationCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="HubLocationCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SubLocationCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CityCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CustomerBranchCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AreaCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CustomerCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="PickPointCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CityLimitType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="FarBCLkm" Type="Int32" />
+          <Property Name="MatchRequestAmount" Type="Boolean" />
+          <Property Name="SpecailDeal" Type="Boolean" />
+          <Property Name="PutOnHold" Type="Boolean" />
+          <Property Name="CancelFlag" Type="Boolean" />
+          <Property Name="Remarks" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ClientNameAsPerLOI" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PickupStatus" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="SolId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="LandMark" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="MaxCashLimit" Type="Decimal" Precision="18" Scale="0" />
+          <Property Name="AuthStatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="RejectRemarks" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="RejectedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="RejectedDate" Type="DateTime" Precision="3" />
+          <Property Name="IsActive" Type="Int32" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="CMSCashLimit" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="Longitude" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Latitude" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="BusinessCityCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="BaseCityCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="NewZoneCode" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="AuthorizedDate" Type="DateTime" Precision="3" />
+          <Property Name="AuthorizedBy" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="flagScanAmount" Type="Boolean" />
+          <NavigationProperty Name="SubLocationMast" Relationship="RCMModel.fk_CCM_SUB" FromRole="ClientCustMaster" ToRole="SubLocationMast" />
+          <NavigationProperty Name="ClientCustAccountMasters" Relationship="RCMModel.fk_ClientCustCode" FromRole="ClientCustMaster" ToRole="ClientCustAccountMaster" />
+          <NavigationProperty Name="ClientCustBankDetail" Relationship="RCMModel.fk_CCD_ClientCustCode" FromRole="ClientCustMaster" ToRole="ClientCustBankDetail" />
+        </EntityType>
+        <EntityType Name="CustomerMaster">
+          <Key>
+            <PropertyRef Name="CustomerCode" />
+            <PropertyRef Name="CompanyCode" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CustomerName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Nationality" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Address" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PinCode" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Telno" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Mobileno" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Faxno" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="EmailId" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="CompanyCode" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="StartDate" Type="DateTime" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Precision="3" />
+          <Property Name="VaultLimit" Type="Int64" />
+          <Property Name="CustomerRemarks" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="IsActive" Type="Int32" Nullable="false" />
+          <Property Name="CreatedBy" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="CustType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AuthorizeDate" Type="DateTime" Precision="3" />
+          <Property Name="RejectRemarks" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="RejectedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="RejectedDate" Type="DateTime" Precision="3" />
+          <Property Name="CustAuthStatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ImagePath" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="ImageMapperID" Type="Int32" />
+          <Property Name="Priority_Id" Type="Int32" Nullable="false" />
+          <Property Name="BankClosureTime" Type="Time" Precision="7" />
+        </EntityType>
+        <EntityContainer Name="rcmentities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ClientCustMasters" EntityType="Self.ClientCustMaster" />
+          <EntitySet Name="CustomerMasters" EntityType="Self.CustomerMaster" />
+          <EntitySet Name="HublocationMasts" EntityType="RCMModel.HublocationMast" />
+          <EntitySet Name="LocationMasts" EntityType="RCMModel.LocationMast" />
+          <EntitySet Name="RegionMasts" EntityType="RCMModel.RegionMast" />
+          <EntitySet Name="SubLocationMasts" EntityType="RCMModel.SubLocationMast" />
+          <AssociationSet Name="fk_CCM_SUB" Association="RCMModel.fk_CCM_SUB">
+            <End Role="SubLocationMast" EntitySet="SubLocationMasts" />
+            <End Role="ClientCustMaster" EntitySet="ClientCustMasters" />
+          </AssociationSet>
+          <AssociationSet Name="fk_CCM_LCM" Association="RCMModel.fk_CCM_LCM">
+            <End Role="LocationMast" EntitySet="LocationMasts" />
+            <End Role="HublocationMast" EntitySet="HublocationMasts" />
+          </AssociationSet>
+          <AssociationSet Name="fk_CCM_SUBM" Association="RCMModel.fk_CCM_SUBM">
+            <End Role="HublocationMast" EntitySet="HublocationMasts" />
+            <End Role="SubLocationMast" EntitySet="SubLocationMasts" />
+          </AssociationSet>
+          <AssociationSet Name="fk_CCM_RGM" Association="RCMModel.fk_CCM_RGM">
+            <End Role="RegionMast" EntitySet="RegionMasts" />
+            <End Role="LocationMast" EntitySet="LocationMasts" />
+          </AssociationSet>
+          <EntitySet Name="ClientCustAccountMasters" EntityType="RCMModel.ClientCustAccountMaster" />
+          <AssociationSet Name="fk_ClientCustCode" Association="RCMModel.fk_ClientCustCode">
+            <End Role="ClientCustMaster" EntitySet="ClientCustMasters" />
+            <End Role="ClientCustAccountMaster" EntitySet="ClientCustAccountMasters" />
+          </AssociationSet>
+          <EntitySet Name="LocationMasters" EntityType="RCMModel.LocationMaster" />
+          <EntitySet Name="ClientAccountMasters" EntityType="RCMModel.ClientAccountMaster" />
+          <EntitySet Name="ClientCustBankDetails" EntityType="RCMModel.ClientCustBankDetail" />
+          <AssociationSet Name="fk_CCD_ClientCustCode" Association="RCMModel.fk_CCD_ClientCustCode">
+            <End Role="ClientCustMaster" EntitySet="ClientCustMasters" />
+            <End Role="ClientCustBankDetail" EntitySet="ClientCustBankDetails" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="HublocationMast">
+          <Key>
+            <PropertyRef Name="hublocationcode" />
+            <PropertyRef Name="CompanyCode" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="hublocationname" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="hublocationcode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="locationcode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyCode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="StateCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LocationMast" Relationship="RCMModel.fk_CCM_LCM" FromRole="HublocationMast" ToRole="LocationMast" />
+          <NavigationProperty Name="SubLocationMasts" Relationship="RCMModel.fk_CCM_SUBM" FromRole="HublocationMast" ToRole="SubLocationMast" />
+        </EntityType>
+        <EntityType Name="LocationMast">
+          <Key>
+            <PropertyRef Name="locationcode" />
+            <PropertyRef Name="CompanyCode" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="locationname" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="locationcode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="regioncode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyCode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="HublocationMasts" Relationship="RCMModel.fk_CCM_LCM" FromRole="LocationMast" ToRole="HublocationMast" />
+          <NavigationProperty Name="RegionMast" Relationship="RCMModel.fk_CCM_RGM" FromRole="LocationMast" ToRole="RegionMast" />
+        </EntityType>
+        <EntityType Name="RegionMast">
+          <Key>
+            <PropertyRef Name="regioncode" />
+            <PropertyRef Name="CompanyCode" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="regionname" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="regioncode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyCode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ZoneCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="LocationMasts" Relationship="RCMModel.fk_CCM_RGM" FromRole="RegionMast" ToRole="LocationMast" />
+        </EntityType>
+        <EntityType Name="SubLocationMast">
+          <Key>
+            <PropertyRef Name="sublocationcode" />
+            <PropertyRef Name="CompanyCode" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="sublocationname" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="sublocationcode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="hublocationcode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyCode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ClientCustMasters" Relationship="RCMModel.fk_CCM_SUB" FromRole="SubLocationMast" ToRole="ClientCustMaster" />
+          <NavigationProperty Name="HublocationMast" Relationship="RCMModel.fk_CCM_SUBM" FromRole="SubLocationMast" ToRole="HublocationMast" />
+        </EntityType>
+        <Association Name="fk_CCM_SUB">
+          <End Type="RCMModel.SubLocationMast" Role="SubLocationMast" Multiplicity="0..1" />
+          <End Type="RCMModel.ClientCustMaster" Role="ClientCustMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="SubLocationMast">
+              <PropertyRef Name="sublocationcode" />
+              <PropertyRef Name="CompanyCode" />
+            </Principal>
+            <Dependent Role="ClientCustMaster">
+              <PropertyRef Name="SubLocationCode" />
+              <PropertyRef Name="CompanyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_CCM_LCM">
+          <End Type="RCMModel.LocationMast" Role="LocationMast" Multiplicity="0..1" />
+          <End Type="RCMModel.HublocationMast" Role="HublocationMast" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="LocationMast">
+              <PropertyRef Name="locationcode" />
+              <PropertyRef Name="CompanyCode" />
+            </Principal>
+            <Dependent Role="HublocationMast">
+              <PropertyRef Name="locationcode" />
+              <PropertyRef Name="CompanyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_CCM_SUBM">
+          <End Type="RCMModel.HublocationMast" Role="HublocationMast" Multiplicity="0..1" />
+          <End Type="RCMModel.SubLocationMast" Role="SubLocationMast" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="HublocationMast">
+              <PropertyRef Name="hublocationcode" />
+              <PropertyRef Name="CompanyCode" />
+            </Principal>
+            <Dependent Role="SubLocationMast">
+              <PropertyRef Name="hublocationcode" />
+              <PropertyRef Name="CompanyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="fk_CCM_RGM">
+          <End Type="RCMModel.RegionMast" Role="RegionMast" Multiplicity="0..1" />
+          <End Type="RCMModel.LocationMast" Role="LocationMast" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RegionMast">
+              <PropertyRef Name="regioncode" />
+              <PropertyRef Name="CompanyCode" />
+            </Principal>
+            <Dependent Role="LocationMast">
+              <PropertyRef Name="regioncode" />
+              <PropertyRef Name="CompanyCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ClientCustAccountMaster">
+          <Key>
+            <PropertyRef Name="ID" />
+            <PropertyRef Name="ClientCustCode" />
+            <PropertyRef Name="AccountId" />
+            <PropertyRef Name="CreatedBy" />
+            <PropertyRef Name="CreatedDate" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientCustCode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AccountId" Type="String" Nullable="false" MaxLength="30" FixedLength="false" Unicode="false" />
+          <Property Name="AccountName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CustomerUniqueId" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="PickupCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="StoreCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="HierarchyCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DivisionCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SubDivisionCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="SubCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CustomerDeptCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CashLimit" Type="Decimal" Precision="18" Scale="2" />
+          <Property Name="ClientCode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CancelFlag" Type="Boolean" />
+          <Property Name="OtherDetail1" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherDetail2" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherDetail3" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherDetail4" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherDetail5" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherDetail6" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherDetail7" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="OtherDetail8" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedBy" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="CompanyCode" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="StartDate" Type="DateTime" Precision="3" />
+          <Property Name="EndDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="ClientCustMaster" Relationship="RCMModel.fk_ClientCustCode" FromRole="ClientCustAccountMaster" ToRole="ClientCustMaster" />
+        </EntityType>
+        <Association Name="fk_ClientCustCode">
+          <End Type="RCMModel.ClientCustMaster" Role="ClientCustMaster" Multiplicity="1" />
+          <End Type="RCMModel.ClientCustAccountMaster" Role="ClientCustAccountMaster" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ClientCustMaster">
+              <PropertyRef Name="ClientCustCode" />
+            </Principal>
+            <Dependent Role="ClientCustAccountMaster">
+              <PropertyRef Name="ClientCustCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="LocationMaster">
+          <Key>
+            <PropertyRef Name="LocationCode" />
+            <PropertyRef Name="CompanyCode" />
+            <PropertyRef Name="sublocationcode" />
+          </Key>
+          <Property Name="LocationCode" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="LocationName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="regioncode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="loccode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="hublocationcode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyCode" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedBy" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="sublocationcode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ClientAccountMaster">
+          <Key>
+            <PropertyRef Name="ClientCode" />
+            <PropertyRef Name="AccountId" />
+          </Key>
+          <Property Name="ClientCode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="AccountId" Type="String" Nullable="false" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="AccountName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="RefName" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="CustomerUniqueId" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="CancelFlag" Type="Boolean" />
+          <Property Name="CreatedBy" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="CompanyCode" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <EntityType Name="ClientCustBankDetail">
+          <Key>
+            <PropertyRef Name="ClientCustCode" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClientCustCode" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="BusinessBank" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="BillingBank" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DepositionBank" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DepositionType" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="BusinessBankAddress" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="BillingBankAddress" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="DepositionBankAddress" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="BusinessBankSolid" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="BillingBankSolid" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="DepositionBankSolid" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifyBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifyDate" Type="DateTime" Precision="3" />
+          <Property Name="CDPPullingARG" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CompanyCode" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="ClientCustMaster" Relationship="RCMModel.fk_CCD_ClientCustCode" FromRole="ClientCustBankDetail" ToRole="ClientCustMaster" />
+        </EntityType>
+        <Association Name="fk_CCD_ClientCustCode">
+          <End Type="RCMModel.ClientCustMaster" Role="ClientCustMaster" Multiplicity="1" />
+          <End Type="RCMModel.ClientCustBankDetail" Role="ClientCustBankDetail" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ClientCustMaster">
+              <PropertyRef Name="ClientCustCode" />
+            </Principal>
+            <Dependent Role="ClientCustBankDetail">
+              <PropertyRef Name="ClientCustCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="RCMModelStoreContainer" CdmEntityContainer="rcmentities">
+          <EntitySetMapping Name="ClientCustMasters">
+            <EntityTypeMapping TypeName="RCMModel.ClientCustMaster">
+              <MappingFragment StoreEntitySet="ClientCustMaster">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="ClientCustCode" ColumnName="ClientCustCode" />
+                <ScalarProperty Name="OldReferenceCode" ColumnName="OldReferenceCode" />
+                <ScalarProperty Name="ClientCustName" ColumnName="ClientCustName" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="LOIStartDate" ColumnName="LOIStartDate" />
+                <ScalarProperty Name="AccountType" ColumnName="AccountType" />
+                <ScalarProperty Name="DepartmentID" ColumnName="DepartmentID" />
+                <ScalarProperty Name="Regioncode" ColumnName="Regioncode" />
+                <ScalarProperty Name="LocationCode" ColumnName="LocationCode" />
+                <ScalarProperty Name="HubLocationCode" ColumnName="HubLocationCode" />
+                <ScalarProperty Name="SubLocationCode" ColumnName="SubLocationCode" />
+                <ScalarProperty Name="CityCode" ColumnName="CityCode" />
+                <ScalarProperty Name="CustomerBranchCode" ColumnName="CustomerBranchCode" />
+                <ScalarProperty Name="AreaCode" ColumnName="AreaCode" />
+                <ScalarProperty Name="CustomerCode" ColumnName="CustomerCode" />
+                <ScalarProperty Name="PickPointCode" ColumnName="PickPointCode" />
+                <ScalarProperty Name="CityLimitType" ColumnName="CityLimitType" />
+                <ScalarProperty Name="FarBCLkm" ColumnName="FarBCLkm" />
+                <ScalarProperty Name="MatchRequestAmount" ColumnName="MatchRequestAmount" />
+                <ScalarProperty Name="SpecailDeal" ColumnName="SpecailDeal" />
+                <ScalarProperty Name="PutOnHold" ColumnName="PutOnHold" />
+                <ScalarProperty Name="CancelFlag" ColumnName="CancelFlag" />
+                <ScalarProperty Name="Remarks" ColumnName="Remarks" />
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+                <ScalarProperty Name="ClientNameAsPerLOI" ColumnName="ClientNameAsPerLOI" />
+                <ScalarProperty Name="PickupStatus" ColumnName="PickupStatus" />
+                <ScalarProperty Name="SolId" ColumnName="SolId" />
+                <ScalarProperty Name="LandMark" ColumnName="LandMark" />
+                <ScalarProperty Name="MaxCashLimit" ColumnName="MaxCashLimit" />
+                <ScalarProperty Name="AuthStatus" ColumnName="AuthStatus" />
+                <ScalarProperty Name="RejectRemarks" ColumnName="RejectRemarks" />
+                <ScalarProperty Name="RejectedBy" ColumnName="RejectedBy" />
+                <ScalarProperty Name="RejectedDate" ColumnName="RejectedDate" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CMSCashLimit" ColumnName="CMSCashLimit" />
+                <ScalarProperty Name="Longitude" ColumnName="Longitude" />
+                <ScalarProperty Name="Latitude" ColumnName="Latitude" />
+                <ScalarProperty Name="BusinessCityCode" ColumnName="BusinessCityCode" />
+                <ScalarProperty Name="BaseCityCode" ColumnName="BaseCityCode" />
+                <ScalarProperty Name="NewZoneCode" ColumnName="NewZoneCode" />
+                <ScalarProperty Name="AuthorizedDate" ColumnName="AuthorizedDate" />
+                <ScalarProperty Name="AuthorizedBy" ColumnName="AuthorizedBy" />
+                <ScalarProperty Name="flagScanAmount" ColumnName="flagScanAmount" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="CustomerMasters">
+            <EntityTypeMapping TypeName="RCMModel.CustomerMaster">
+              <MappingFragment StoreEntitySet="CustomerMaster">
+                <ScalarProperty Name="ID" ColumnName="ID" />
+                <ScalarProperty Name="CustomerCode" ColumnName="CustomerCode" />
+                <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+                <ScalarProperty Name="Nationality" ColumnName="Nationality" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="PinCode" ColumnName="PinCode" />
+                <ScalarProperty Name="Telno" ColumnName="Telno" />
+                <ScalarProperty Name="Mobileno" ColumnName="Mobileno" />
+                <ScalarProperty Name="Faxno" ColumnName="Faxno" />
+                <ScalarProperty Name="EmailId" ColumnName="EmailId" />
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="VaultLimit" ColumnName="VaultLimit" />
+                <ScalarProperty Name="CustomerRemarks" ColumnName="CustomerRemarks" />
+                <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="CustType" ColumnName="CustType" />
+                <ScalarProperty Name="AuthorizeDate" ColumnName="AuthorizeDate" />
+                <ScalarProperty Name="RejectRemarks" ColumnName="RejectRemarks" />
+                <ScalarProperty Name="RejectedBy" ColumnName="RejectedBy" />
+                <ScalarProperty Name="RejectedDate" ColumnName="RejectedDate" />
+                <ScalarProperty Name="CustAuthStatus" ColumnName="CustAuthStatus" />
+                <ScalarProperty Name="ImagePath" ColumnName="ImagePath" />
+                <ScalarProperty Name="ImageMapperID" ColumnName="ImageMapperID" />
+                <ScalarProperty Name="Priority_Id" ColumnName="Priority_Id" />
+                <ScalarProperty Name="BankClosureTime" ColumnName="BankClosureTime" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="HublocationMasts">
+            <EntityTypeMapping TypeName="RCMModel.HublocationMast">
+              <MappingFragment StoreEntitySet="HublocationMast">
+                <ScalarProperty Name="StateCode" ColumnName="StateCode" />
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+                <ScalarProperty Name="locationcode" ColumnName="locationcode" />
+                <ScalarProperty Name="hublocationcode" ColumnName="hublocationcode" />
+                <ScalarProperty Name="hublocationname" ColumnName="hublocationname" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LocationMasts">
+            <EntityTypeMapping TypeName="RCMModel.LocationMast">
+              <MappingFragment StoreEntitySet="LocationMast">
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+                <ScalarProperty Name="regioncode" ColumnName="regioncode" />
+                <ScalarProperty Name="locationcode" ColumnName="locationcode" />
+                <ScalarProperty Name="locationname" ColumnName="locationname" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RegionMasts">
+            <EntityTypeMapping TypeName="RCMModel.RegionMast">
+              <MappingFragment StoreEntitySet="RegionMast">
+                <ScalarProperty Name="ZoneCode" ColumnName="ZoneCode" />
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+                <ScalarProperty Name="regioncode" ColumnName="regioncode" />
+                <ScalarProperty Name="regionname" ColumnName="regionname" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="SubLocationMasts">
+            <EntityTypeMapping TypeName="RCMModel.SubLocationMast">
+              <MappingFragment StoreEntitySet="SubLocationMast">
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+                <ScalarProperty Name="hublocationcode" ColumnName="hublocationcode" />
+                <ScalarProperty Name="sublocationcode" ColumnName="sublocationcode" />
+                <ScalarProperty Name="sublocationname" ColumnName="sublocationname" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ClientCustAccountMasters">
+            <EntityTypeMapping TypeName="RCMModel.ClientCustAccountMaster">
+              <MappingFragment StoreEntitySet="ClientCustAccountMaster">
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="OtherDetail8" ColumnName="OtherDetail8" />
+                <ScalarProperty Name="OtherDetail7" ColumnName="OtherDetail7" />
+                <ScalarProperty Name="OtherDetail6" ColumnName="OtherDetail6" />
+                <ScalarProperty Name="OtherDetail5" ColumnName="OtherDetail5" />
+                <ScalarProperty Name="OtherDetail4" ColumnName="OtherDetail4" />
+                <ScalarProperty Name="OtherDetail3" ColumnName="OtherDetail3" />
+                <ScalarProperty Name="OtherDetail2" ColumnName="OtherDetail2" />
+                <ScalarProperty Name="OtherDetail1" ColumnName="OtherDetail1" />
+                <ScalarProperty Name="CancelFlag" ColumnName="CancelFlag" />
+                <ScalarProperty Name="ClientCode" ColumnName="ClientCode" />
+                <ScalarProperty Name="CashLimit" ColumnName="CashLimit" />
+                <ScalarProperty Name="CustomerDeptCode" ColumnName="CustomerDeptCode" />
+                <ScalarProperty Name="SubCode" ColumnName="SubCode" />
+                <ScalarProperty Name="SubDivisionCode" ColumnName="SubDivisionCode" />
+                <ScalarProperty Name="DivisionCode" ColumnName="DivisionCode" />
+                <ScalarProperty Name="HierarchyCode" ColumnName="HierarchyCode" />
+                <ScalarProperty Name="StoreCode" ColumnName="StoreCode" />
+                <ScalarProperty Name="PickupCode" ColumnName="PickupCode" />
+                <ScalarProperty Name="CustomerUniqueId" ColumnName="CustomerUniqueId" />
+                <ScalarProperty Name="AccountName" ColumnName="AccountName" />
+                <ScalarProperty Name="AccountId" ColumnName="AccountId" />
+                <ScalarProperty Name="ClientCustCode" ColumnName="ClientCustCode" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="LocationMasters">
+            <EntityTypeMapping TypeName="RCMModel.LocationMaster">
+              <MappingFragment StoreEntitySet="LocationMaster">
+                <ScalarProperty Name="sublocationcode" ColumnName="sublocationcode" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+                <ScalarProperty Name="hublocationcode" ColumnName="hublocationcode" />
+                <ScalarProperty Name="loccode" ColumnName="loccode" />
+                <ScalarProperty Name="regioncode" ColumnName="regioncode" />
+                <ScalarProperty Name="LocationName" ColumnName="LocationName" />
+                <ScalarProperty Name="LocationCode" ColumnName="LocationCode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ClientAccountMasters">
+            <EntityTypeMapping TypeName="RCMModel.ClientAccountMaster">
+              <MappingFragment StoreEntitySet="ClientAccountMaster">
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="CancelFlag" ColumnName="CancelFlag" />
+                <ScalarProperty Name="CustomerUniqueId" ColumnName="CustomerUniqueId" />
+                <ScalarProperty Name="RefName" ColumnName="RefName" />
+                <ScalarProperty Name="AccountName" ColumnName="AccountName" />
+                <ScalarProperty Name="AccountId" ColumnName="AccountId" />
+                <ScalarProperty Name="ClientCode" ColumnName="ClientCode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ClientCustBankDetails">
+            <EntityTypeMapping TypeName="RCMModel.ClientCustBankDetail">
+              <MappingFragment StoreEntitySet="ClientCustBankDetails">
+                <ScalarProperty Name="CompanyCode" ColumnName="CompanyCode" />
+                <ScalarProperty Name="CDPPullingARG" ColumnName="CDPPullingARG" />
+                <ScalarProperty Name="ModifyDate" ColumnName="ModifyDate" />
+                <ScalarProperty Name="ModifyBy" ColumnName="ModifyBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="DepositionBankSolid" ColumnName="DepositionBankSolid" />
+                <ScalarProperty Name="BillingBankSolid" ColumnName="BillingBankSolid" />
+                <ScalarProperty Name="BusinessBankSolid" ColumnName="BusinessBankSolid" />
+                <ScalarProperty Name="DepositionBankAddress" ColumnName="DepositionBankAddress" />
+                <ScalarProperty Name="BillingBankAddress" ColumnName="BillingBankAddress" />
+                <ScalarProperty Name="BusinessBankAddress" ColumnName="BusinessBankAddress" />
+                <ScalarProperty Name="DepositionType" ColumnName="DepositionType" />
+                <ScalarProperty Name="DepositionBank" ColumnName="DepositionBank" />
+                <ScalarProperty Name="BillingBank" ColumnName="BillingBank" />
+                <ScalarProperty Name="BusinessBank" ColumnName="BusinessBank" />
+                <ScalarProperty Name="ClientCustCode" ColumnName="ClientCustCode" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

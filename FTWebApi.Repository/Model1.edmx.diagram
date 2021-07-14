@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="931ae484fb614ad7bb919eaaa13ae7f4" Name="Diagram1" ZoomLevel="37">
+        <EntityTypeShape EntityType="RCMModel.ClientCustMaster" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="RCMModel.CustomerMaster" Width="1.5" PointX="4.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="RCMModel.HublocationMast" Width="1.5" PointX="1.5" PointY="12.75" />
+        <EntityTypeShape EntityType="RCMModel.LocationMast" Width="1.5" PointX="1.5" PointY="16.875" />
+        <EntityTypeShape EntityType="RCMModel.RegionMast" Width="1.5" PointX="1.5" PointY="21" />
+        <EntityTypeShape EntityType="RCMModel.SubLocationMast" Width="1.5" PointX="0.75" PointY="4.875" />
+        <AssociationConnector Association="RCMModel.fk_CCM_SUB" />
+        <AssociationConnector Association="RCMModel.fk_CCM_LCM" />
+        <AssociationConnector Association="RCMModel.fk_CCM_SUBM" />
+        <AssociationConnector Association="RCMModel.fk_CCM_RGM" />
+        <EntityTypeShape EntityType="RCMModel.ClientCustAccountMaster" Width="1.5" PointX="5" PointY="8.625" />
+        <AssociationConnector Association="RCMModel.fk_ClientCustCode" />
+        <EntityTypeShape EntityType="RCMModel.LocationMaster" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="RCMModel.ClientAccountMaster" Width="1.5" PointX="7.375" PointY="4.75" />
+        <EntityTypeShape EntityType="RCMModel.ClientCustBankDetail" Width="1.5" PointX="5" PointY="16.875" />
+        <AssociationConnector Association="RCMModel.fk_CCD_ClientCustCode" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
