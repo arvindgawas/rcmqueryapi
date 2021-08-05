@@ -26,5 +26,6 @@ namespace FTWebApi.Repository
         public Nullable<System.DateTime> ModifiedDate { get; set; }
         public string acceptstatus { get; set; }
         public string oldbatchid { get; set; }
+        public string Emailcc { get; set; }
     }
 }

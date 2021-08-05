@@ -11,6 +11,8 @@ using System.Net;
 using System.Web.UI.HtmlControls;
 using System.IO;
 using System.Web.UI;
+using System.Data.Entity.SqlServer;
+using System.Data.Entity;
 
 namespace FTWebApi.Repository
 {
@@ -87,6 +89,7 @@ namespace FTWebApi.Repository
                 objticketcount.opencount = opencount;
                 objticketcount.closecount = closecount;
                 objticketcount.totalcount = totalcount;
+                objticketcount.pendingcount = totalcount - closecount;
 
                 objticketcountlst.Add(objticketcount);
 
@@ -158,7 +161,7 @@ namespace FTWebApi.Repository
                 objticketcount.opencount = opencount;
                 objticketcount.closecount = closecount;
                 objticketcount.totalcount = totalcount;
-
+                objticketcount.pendingcount = totalcount - closecount;
                 objticketcountlst.Add(objticketcount);
 
                 }
@@ -307,7 +310,7 @@ namespace FTWebApi.Repository
             //join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
             //&area.regioncode == a.Regioncode & area.LocationCode == a.LocationCode & area.hublocationcode == a.HubLocationCode
 
-            var crnno = (from a in rcmDataContext.ClientCustMasters
+                    var crnno = (from a in rcmDataContext.ClientCustMasters
                          join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
                          join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
                          join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
@@ -319,10 +322,10 @@ namespace FTWebApi.Repository
                          & l.regioncode == r.regioncode & h.locationcode == l.locationcode
                          select new rcmdetail { crn = a.ClientCustCode, clientname = a.ClientCustName, region = r.regionname,
                              location = l.locationname, hublocation = h.hublocationname, area = area.LocationName
-                             , customertype = a.AccountType, cdpncm = j.DepositionType, hierarchycode = b.HierarchyCode
+                             , customertype = a.AccountType, cdpncm = j.DepositionType, hierarchycode = b.HierarchyCode,Company = a.CompanyCode
                          }).SingleOrDefault();
 
-            return crnno;
+                return crnno;
 
         }
 
@@ -351,10 +354,162 @@ namespace FTWebApi.Repository
                              area = area.LocationName,
                              customertype = a.AccountType,
                              cdpncm = j.DepositionType,
-                             hierarchycode = b.HierarchyCode
+                             hierarchycode = b.HierarchyCode,
+                             Company = a.CompanyCode
                          }).SingleOrDefault();
 
             return crnno;
+
+        }
+        public void AddExcelCloseData(List<FTWebApi.Models.Ticket> lstTicket, List<FTWebApi.Models.ticketdetails> lsttd)
+        {
+            foreach (var objticket in lstTicket)
+            {
+                
+                Ticket tc = (from c in DataContext.Tickets
+                             where c.TicketID == objticket.ticketno
+                             select c).FirstOrDefault();
+
+                var errorid = (from e in DataContext.ErrorTypes
+                               where e.querytype == tc.tikcettype && e.ErrorType1 == objticket.errortype
+                               select e.ID).SingleOrDefault();
+
+                tc.mistakedoneby = objticket.mistakedoneby;
+                tc.errortype = errorid.ToString();
+                tc.problem = objticket.problem;
+                tc.querystatus = "Close";
+                tc.resolveddate = DateTime.Now;
+                tc.ModifiedDate = DateTime.Now;
+
+                TicketDetail td = (from c in DataContext.TicketDetails
+                                    where c.TicketID == objticket.ticketno
+                                    select c).FirstOrDefault();
+
+                FTWebApi.Models.ticketdetails tdexcel = lsttd.Where(a => a.ticketno == objticket.ticketno).FirstOrDefault();
+
+                td.TicketID = objticket.ticketno;
+                td.pickupcode = tc.pickupcode;
+                td.clientcode = tc.clientcode;
+                td.crnno = tc.crnno;
+                td.pickupdate = tdexcel.pickupdate;
+                td.actualhcin = tdexcel.actualhcin;
+                td.actualamt = tdexcel.actualamt;
+                td.ModifiedDate = DateTime.Now;
+
+                DataContext.SaveChanges();
+
+            }
+
+        }
+
+            public void AddExcelData(List<FTWebApi.Models.Ticket> lstticket)
+        {
+            string ticketno = "";
+            string assigneduser = "";
+            string sbatchno = "";
+
+            foreach (var objticket in lstticket)
+            {
+                sbatchno = "";
+                sbatchno = getbatchno();
+
+                Batch bt = new Batch();
+
+                bt.BatchID = sbatchno;
+                bt.Date = DateTime.Today;
+                bt.EmailBody = "upload";
+                bt.EmailSubject = objticket.emailsubject;
+                bt.FromEmail = objticket.emailfrom;
+                bt.CreatedDate = DateTime.Now;
+
+                DataContext.Batches.Add(bt);
+
+                //DataContext.SaveChanges();
+
+                var ticketlist = (from a in rcmDataContext.ClientCustMasters
+                                  join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
+                                  join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
+                                  join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
+                                  join l in rcmDataContext.LocationMasts on a.LocationCode equals l.locationcode
+                                  join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
+                                  join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
+                                  join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
+                                  where a.ClientCustCode == objticket.crnno
+                                  & l.regioncode == r.regioncode & h.locationcode == l.locationcode
+                                  select new
+                                  {
+                                      crnno = objticket.crnno,
+                                      tickettype = objticket.tickettype,
+                                      pickupcode = b.PickupCode,
+                                      clientcode = b.ClientCode,
+                                      client = a.ClientCustName,
+                                      region = r.regionname,
+                                      location = l.locationname,
+                                      hublocation = h.hublocationname,
+                                      area = area.LocationName,
+                                      customertype = a.AccountType,
+                                      cdpncm = j.DepositionType,
+                                      hierarchycode = b.HierarchyCode
+
+                                  }).AsQueryable();
+
+                foreach (var newticket in ticketlist)
+                {
+                    ticketno = genticketno();
+                    assigneduser = "";
+
+                    Ticket tc = new Ticket();
+
+                    tc.TicketID = ticketno;
+
+                    if (objticket.bank != null && objticket.bank != "")
+                    {
+                        if (objticket.tickettype != "")
+                        {
+                            assigneduser = (from c in DataContext.usermasters
+                                            join m in DataContext.userbankmaps on c.Userid equals m.Userid
+                                            where m.Bank.Contains(objticket.bank) & m.QueryType == objticket.tickettype & m.UserPriority == "1"
+                                            select c.Userid).SingleOrDefault();
+                        }
+                        else
+                        {
+                            assigneduser = (from c in DataContext.usermasters
+                                            join m in DataContext.userbankmaps on c.Userid equals m.Userid
+                                            where m.Bank.Contains(objticket.bank) & m.UserPriority == "1"
+                                            select c.Userid).SingleOrDefault();
+                        }
+                        tc.assignedto = assigneduser;
+                        tc.querystatus = "Assigned";
+                    }
+
+                    tc.ticketdate = DateTime.Today;
+                    tc.BatchID = sbatchno;
+                    //tc.tikcettime = TimeSpan.Parse(DateTime.Now.ToLongTimeString());
+                    //tc.tikcettime = TimeSpan.Parse("12:15");
+                    tc.tikcettime = TimeSpan.Parse(DateTime.Now.ToString("HH:mm:ss"));
+                    tc.tikcettype = objticket.tickettype;
+                    tc.customer = objticket.bank;
+                    tc.acceptstatus = "MAccept";
+                    tc.pickupcode = newticket.pickupcode;
+                    tc.clientcode = newticket.clientcode;
+                    tc.client = newticket.client;
+                    tc.crnno = newticket.crnno;
+                    tc.area = newticket.area;
+                    tc.cdpncm = newticket.cdpncm;
+                    tc.region = newticket.region;
+                    tc.location = newticket.location;
+                    tc.hublocation = newticket.hublocation;
+                    tc.customertype = newticket.customertype;
+                    tc.hierarchycode = newticket.hierarchycode;
+                    tc.querystatus = "Open";
+                    tc.CreatedBy = "";
+                    tc.CreatedDate = DateTime.Now;
+
+                    DataContext.Tickets.Add(tc);
+
+                }
+            }
+             DataContext.SaveChanges();
 
         }
 
@@ -368,8 +523,6 @@ namespace FTWebApi.Repository
 
             try
             {
-
-
                 if (userrole == "admin")
                 {
                     lstTicket = (from a in DataContext.Tickets
@@ -509,6 +662,7 @@ namespace FTWebApi.Repository
                                      mistakedoneby = a.mistakedoneby,
                                      errortype = a.errortype,
                                      status = a.querystatus,
+                                     rejectremark = a.rejectremark,
                                      createduser = a.CreatedBy,
                                      //createddate = (DateTime)a.CreatedDate,
                                      modifieduser = a.ModifiedBy,
@@ -550,6 +704,7 @@ namespace FTWebApi.Repository
                                      mistakedoneby = a.mistakedoneby,
                                      errortype = a.errortype,
                                      status = a.querystatus,
+                                     rejectremark = a.rejectremark,
                                      createduser = a.CreatedBy,
                                      //createddate = (DateTime)a.CreatedDate,
                                      modifieduser = a.ModifiedBy,
@@ -602,6 +757,8 @@ namespace FTWebApi.Repository
             //join b in DataContext.Batches on a.BatchID equals b.BatchID
             //emailsubject = b.EmailSubject,emailfrom = b.FromEmail,
 
+            //TimeSpan.Parse(DateTime.Now.ToLongTimeString());
+
             var lstTicket = (from a in DataContext.Tickets
                              join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
                              from b in ps.DefaultIfEmpty()
@@ -617,8 +774,8 @@ namespace FTWebApi.Repository
                                  emailsubject = b.EmailSubject,
                                  emailfrom = b.FromEmail,
                                  emailbody = b.EmailBody,
+                                 emailcc = b.Emailcc,
                                  acceptstatus = a.acceptstatus,
-                                 //resolveddate = (DateTime)a.resolveddate,
                                  bank = a.customer,
                                  pickupcode = a.pickupcode,
                                  clientcode = a.clientcode,
@@ -638,10 +795,13 @@ namespace FTWebApi.Repository
                                  filepath = a.filepath,
                                  filename = a.filename,
                                  createduser = a.CreatedBy,
+                                 company = a.Company,
                                  //createddate = (DateTime)a.CreatedDate,
                                  modifieduser = a.ModifiedBy,
-                                 //modifieddate = (DateTime)a.ModifiedDate
+                                 modifieddate = DateTime.Today
                              }).SingleOrDefault();
+
+            lstTicket.tickettime = TimeSpan.Parse(lstTicket.tickettime.ToString(@"hh\:mm"));
 
             return lstTicket;
         }
@@ -661,8 +821,10 @@ namespace FTWebApi.Repository
         }
         public void UpdateTicketAccept(FTWebApi.Models.Ticket[] objlst)
         {
+            string batchno = "";
             try
             {
+                /*
                 foreach (FTWebApi.Models.Ticket tmptilist in objlst)
                 {
                     Ticket tc = (from c in DataContext.Tickets
@@ -671,47 +833,81 @@ namespace FTWebApi.Repository
 
                     tc.acceptstatus = tmptilist.acceptstatus;
                     tc.rejectremark =  tmptilist.rejectremark;
-
                 }
-
-                DataContext.SaveChanges();
+                */
 
                 foreach (FTWebApi.Models.Ticket tmptilist in objlst)
                 {
-                    var ticketcount = (from a in DataContext.Tickets
-                                       where a.BatchID == tmptilist.batchno
-                                       select a.TicketID).Count();
-
-                    var ticketacceptcount = (from a in DataContext.Tickets
-                                             where a.BatchID == tmptilist.batchno & a.acceptstatus == "Accept"
-                                             select a.TicketID).Count();
-                    
-                    var ticketrejectcount = (from a in DataContext.Tickets
-                                             where a.BatchID == tmptilist.batchno & a.acceptstatus == "Reject"
-                                             select a.TicketID).Count();
-
-                    var ticketduplicatecount = (from a in DataContext.Tickets
-                                             where a.BatchID == tmptilist.batchno & a.acceptstatus == "Duplicate"
-                                             select a.TicketID).Count();
-
-                    if (ticketcount == ticketacceptcount)
+                    if (batchno != tmptilist.batchno)
                     {
-                        FTWebApi.Repository.Batch vbatch = DataContext.Batches.Where(x => x.BatchID == tmptilist.batchno).SingleOrDefault();
-                        sendemailaccept(vbatch,"accept");
-                    }
+                        var ticketlist = (from c in DataContext.Tickets
+                                          where c.BatchID == tmptilist.batchno
+                                          select c).AsQueryable();
 
-                    if (ticketcount == ticketrejectcount)
+                        foreach (var objticket in ticketlist)
+                        {
+                            Ticket tc = (from c in DataContext.Tickets
+                                         where c.TicketID == objticket.TicketID
+                                         select c).FirstOrDefault();
+
+                            tc.acceptstatus = tmptilist.acceptstatus;
+                            tc.rejectremark = tmptilist.rejectremark;
+                        }
+                    }
+                    batchno = tmptilist.batchno;
+                }
+
+                DataContext.SaveChanges();
+                batchno = "";
+                foreach (FTWebApi.Models.Ticket tmptilist in objlst)
+                {
+                    if (batchno != tmptilist.batchno)
                     {
-                        FTWebApi.Repository.Batch vbatch = DataContext.Batches.Where(x => x.BatchID == tmptilist.batchno).SingleOrDefault();
-                        sendemailaccept(vbatch, "reject");
-                    }
+                        var ticketcount = (from a in DataContext.Tickets
+                                           where a.BatchID == tmptilist.batchno
+                                           select a.TicketID).Count();
 
-                    if (ticketcount == ticketduplicatecount)
-                    {
-                        FTWebApi.Repository.Batch vbatch = DataContext.Batches.Where(x => x.BatchID == tmptilist.batchno).SingleOrDefault();
-                        sendemailaccept(vbatch, "duplicate");
-                    }
+                        var ticketacceptcount = (from a in DataContext.Tickets
+                                                 where a.BatchID == tmptilist.batchno & a.acceptstatus == "Accept"
+                                                 select a.TicketID).Count();
 
+                        var ticketrejectcount = (from a in DataContext.Tickets
+                                                 where a.BatchID == tmptilist.batchno & a.acceptstatus == "Reject"
+                                                 select a.TicketID).Count();
+
+                        var ticketduplicatecount = (from a in DataContext.Tickets
+                                                    where a.BatchID == tmptilist.batchno & a.acceptstatus == "Duplicate"
+                                                    select a.TicketID).Count();
+
+                        if (ticketcount == ticketacceptcount)
+                        {
+                            if (tmptilist.acceptstatus == "Accept")
+                            {
+                                FTWebApi.Repository.Batch vbatch = DataContext.Batches.Where(x => x.BatchID == tmptilist.batchno).SingleOrDefault();
+                                sendemailaccept(vbatch, "accept", "");
+                            }
+                        }
+
+                        if (ticketcount == ticketrejectcount)
+                        {
+                            if (tmptilist.acceptstatus == "Reject")
+                            {
+                                FTWebApi.Repository.Batch vbatch = DataContext.Batches.Where(x => x.BatchID == tmptilist.batchno).SingleOrDefault();
+                                sendemailaccept(vbatch, "reject", tmptilist.rejectremark);
+                            }
+                        }
+
+                        if (ticketcount == ticketduplicatecount)
+                        {
+                            if (tmptilist.acceptstatus == "Duplicate")
+                            {
+
+                                FTWebApi.Repository.Batch vbatch = DataContext.Batches.Where(x => x.BatchID == tmptilist.batchno).SingleOrDefault();
+                                sendemailaccept(vbatch, "duplicate", "");
+                            }
+                        }
+                    }
+                    batchno = tmptilist.batchno;
                 }
 
             }
@@ -723,12 +919,17 @@ namespace FTWebApi.Repository
         }
 
 
-        private void sendemailaccept(FTWebApi.Repository.Batch vbatch,string status)
+        private void sendemailaccept(FTWebApi.Repository.Batch vbatch,string status,string rejectremark)
         {
             MailMessage message = new MailMessage();
             SmtpClient smtp = new SmtpClient();
             string msgsubject = "";
             string msgbody = "";
+
+            if (vbatch.FromEmail=="")
+            {
+                return;
+            }
 
             message.From = new MailAddress("rcmuatquery@cms.com");
             message.To.Add(new MailAddress(vbatch.FromEmail));
@@ -738,7 +939,7 @@ namespace FTWebApi.Repository
                 msgsubject = vbatch.BatchID + " " + vbatch.EmailSubject;
 
                 msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td>Thank you for writing to CMS Customer Service team!</td></tr><tr><td>Your query has been received vide batch no " + vbatch.BatchID +
-                         " and will revert asap. Please note the interaction number for future reference.</td></tr><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
+                         " and will revert asap.</td></tr><tr><td>Please note the interaction number for future reference.</td></tr><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
 
             }
             else if (status == "duplicate")
@@ -746,7 +947,7 @@ namespace FTWebApi.Repository
                 msgsubject = "Duplicate "+ vbatch.EmailSubject;
 
                 msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td>Thank you for writing to CMS Customer Service team!</td></tr><tr><td>Please note this is considered Duplicate request as team already working on same query against batch no" + vbatch.oldbatchid +
-                         "Please note this interaction number for future reference.</td></tr><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
+                         "</td></tr><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
 
             }
             else if (status == "reject")
@@ -754,7 +955,7 @@ namespace FTWebApi.Repository
                 msgsubject = "Rejected " + vbatch.BatchID + " " + vbatch.EmailSubject;
 
                 msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td>Thank you for writing to CMS Customer Service team!</td></tr><tr><td>Your query has been received vide batch no " + vbatch.BatchID +
-                            " and will revert asap. Please note your query has been rejected due to below concerns.</td></tr><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
+                            " and will revert asap. Please note your query has been rejected due to below concerns.</td></tr><tr><td>"+ rejectremark + "</tr></td><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
 
             }
 
@@ -820,6 +1021,7 @@ namespace FTWebApi.Repository
                 tc.querystatus = objticket.status;
                 tc.customertype = objticket.customertype;
                 tc.hierarchycode = objticket.hierarchycode;
+                tc.Company = objticket.company;
 
                 if (objticket.status == "Close")
                 {
@@ -829,7 +1031,7 @@ namespace FTWebApi.Repository
                     //tc.ModifiedBy = objticket.modifieduser;
                 tc.ModifiedDate = DateTime.Now; 
 
-                    DataContext.SaveChanges();
+                DataContext.SaveChanges();
             }
             catch (Exception ec)
             {
@@ -841,17 +1043,21 @@ namespace FTWebApi.Repository
         {
             
             DateTime dt = DateTime.Parse(datefilter);
-
             TimeSpan? diff;
             double hours=0;
             string html;
+            DateTime dtprocess = DateTime.Today.AddDays(-3);
+            DateTime tdate;
+            string st1;
+            TimeSpan t1;
+            TimeSpan t2;
 
             List<FTWebApi.Models.Ticket> objticketlist = new List<FTWebApi.Models.Ticket>();
             FTWebApi.Models.Ticket objticket;
 
             var lstTicket = (from a in DataContext.Tickets
                              join b in DataContext.Batches on a.BatchID equals b.BatchID
-                             where a.ticketdate == dt
+                             where a.ticketdate >= dtprocess && a.ticketdate <= DateTime.Today && a.resolveddate == null  
                              select new
                              {
                                  ticketno = a.TicketID,
@@ -870,52 +1076,62 @@ namespace FTWebApi.Repository
 
             foreach ( var ticket in lstTicket)
             {
-                if (ticket.resolveddate == null)
-                {
-                    diff = (DateTime.Now - ticket.createddate);
-                    hours = diff.Value.TotalHours ;
-                }
-                else
-                {
-                    diff = (ticket.resolveddate - ticket.createddate);
-                    hours = diff.Value.TotalHours;
-                }
 
-                if (hours > 2 && ticket.tickettype=="PICKUP")
+                if (ticket.createddate.HasValue)
                 {
-                    objticket = new FTWebApi.Models.Ticket
+                    tdate = ticket.createddate.Value;
+                    st1 = tdate.ToString("H:mm");
+                    t1 = TimeSpan.Parse(st1);
+                    t2 = TimeSpan.Parse("18:00");
+
+                    if (ticket.createddate.Value.Date == DateTime.Today && t1 <= t2)
                     {
-                        batchno = ticket.batchno,
-                        ticketno= ticket.ticketno,
-                        ticketdate = ticket.ticketdate,
-                        tickettype = ticket.tickettype,
-                        status = ticket.ticketstatus,
-                        bank =ticket.customer,
-                        emailfrom = ticket.emailfrom,
-                        assignedto = ticket.assignedto,
-                        emailsubject = ticket.emailsubject
-                    };
-
-                    objticketlist.Add(objticket);
-
-                }
-                else if (hours > 4 && ticket.tickettype == "CREDIT")
-                {
-                    objticket = new FTWebApi.Models.Ticket
+                        diff = (DateTime.Now - ticket.createddate);
+                        hours = diff.Value.TotalHours;
+                    }
+                    else if (ticket.createddate.Value.Date != DateTime.Today )
                     {
-                        batchno = ticket.batchno,
-                        ticketno = ticket.ticketno,
-                        ticketdate = ticket.ticketdate,
-                        tickettype = ticket.tickettype,
-                        status = ticket.ticketstatus,
-                        bank = ticket.customer,
-                        emailfrom = ticket.emailfrom,
-                        assignedto = ticket.assignedto,
-                        emailsubject = ticket.emailsubject
-                    };
+                        diff = (DateTime.Now - ticket.createddate);
+                        hours = diff.Value.TotalHours - 16;
+                    }
 
-                    objticketlist.Add(objticket);
-                }
+
+                    if (hours > 2 && ticket.tickettype == "PICKUP")
+                    {
+                        objticket = new FTWebApi.Models.Ticket
+                        {
+                            batchno = ticket.batchno,
+                            ticketno = ticket.ticketno,
+                            ticketdate = ticket.ticketdate,
+                            tickettype = ticket.tickettype,
+                            status = ticket.ticketstatus,
+                            bank = ticket.customer,
+                            emailfrom = ticket.emailfrom,
+                            assignedto = ticket.assignedto,
+                            emailsubject = ticket.emailsubject
+                        };
+
+                        objticketlist.Add(objticket);
+
+                    }
+                    else if (hours > 4 && ticket.tickettype == "CREDIT")
+                    {
+                        objticket = new FTWebApi.Models.Ticket
+                        {
+                            batchno = ticket.batchno,
+                            ticketno = ticket.ticketno,
+                            ticketdate = ticket.ticketdate,
+                            tickettype = ticket.tickettype,
+                            status = ticket.ticketstatus,
+                            bank = ticket.customer,
+                            emailfrom = ticket.emailfrom,
+                            assignedto = ticket.assignedto,
+                            emailsubject = ticket.emailsubject
+                        };
+
+                        objticketlist.Add(objticket);
+                    }
+                }        
 
             }
 
@@ -1012,7 +1228,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                              join b in DataContext.Tickets on a.TicketID equals b.TicketID
                              join c in DataContext.Batches on b.BatchID equals c.BatchID
                              where b.ticketdate >= dtfromdate && b.ticketdate <= dttodate && b.customer == (scustomer ?? b.customer)
-                             && b.assignedto == (suser ?? b.assignedto) && b.customertype == (scustomertype ?? b.customertype )
+                             && b.assignedto == (suser ?? b.assignedto) && b.customertype == (scustomertype ?? b.customertype)
                              && b.region == (sregion ?? b.region) && b.location == (slocation ?? b.location) && b.hublocation == (shublocation ?? b.hublocation)
                              && b.cdpncm == (scdpncm ?? b.cdpncm) && b.tikcettype == (sissuetype ?? b.tikcettype)
                              select new
@@ -1022,7 +1238,10 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                                  ticketno = b.TicketID,
                                  ticketdate = b.ticketdate,
                                  tickettime = b.tikcettime,
+                                 ticketype = b.tikcettype,
                                  ticketstatus = b.acceptstatus,
+                                 resolveddate = b.resolveddate,
+                                 createddate = b.CreatedDate,
                                  emailfrom = c.FromEmail,
                                  emailsubject = c.EmailSubject,
                                  querytype = b.tikcettype,
@@ -1038,35 +1257,47 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                                  area = b.area,
                                  cdpncm = b.cdpncm,
                                  wrongclientcode = a.wrongclientcode,
-                                 actualclientcode =  a.clientcode,
+                                 actualclientcode = a.clientcode,
                                  wrongpickupcode = a.wrongpickupcode,
-                                 actualpickupcode =a.pickupcode,
-                                 wrongcustomeruniquecode=a.wrongcustomeruniquecode,
-                                 actualcustomeruniquecode=a.customeruniquecode,
+                                 actualpickupcode = a.pickupcode,
+                                 wrongcustomeruniquecode = a.wrongcustomeruniquecode,
+                                 actualcustomeruniquecode = a.customeruniquecode,
                                  wronghcin = a.wronghcin,
                                  actualhcin = a.actualhcin,
-                                 wrongdispis =a.wrongdispis,
-                                 actualdispis=a.actualdispis,
-                                 wrongamt =a.wrongamt,
-                                 actualamt= a.actualamt,
-                                 depostiondate= a.depostiondate,
-                                 querystatus =b.querystatus
+                                 wrongdispis = a.wrongdispis,
+                                 actualdispis = a.actualdispis,
+                                 wrongamt = a.wrongamt,
+                                 actualamt = a.actualamt,
+                                 depostiondate = a.depostiondate,
+                                 querystatus = b.querystatus,
+                                 company = b.Company,
+                                 rejectremark = b.rejectremark,
+                                 oldbatchid = c.oldbatchid,
+                                 //aging = b.CreatedDate - b.resolveddate,
+                                 aging = 0,
+                                 sla = ""
                              });
 
             var table = new HtmlTable();
             var mailMessage = new StringBuilder();
             string html="";
+            Int32 count = 0;
 
             if (lstTicket != null)
             {
                 HtmlTableRow row = new HtmlTableRow();
-
+                row.Cells.Add(new HtmlTableCell { InnerText = "SR"});
                 row.Cells.Add(new HtmlTableCell { InnerText = "Assigned to" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "CRA - CMS/SIPL" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Batch id" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Ticket no" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Ticket Date" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Ticket Time" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Ticket status" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Reject Remark" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Ticket Resolved Date" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Aging" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "SLA" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Email from" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Email subject" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Query type" });
@@ -1094,18 +1325,63 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                 row.Cells.Add(new HtmlTableCell { InnerText = "Wrong Amount" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Actual Amount" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Depostion date" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Original BatchId" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Query Status" });
                 table.Rows.Add(row);
 
                 foreach (var objreport in lstTicket)
                 {
+                    count++;
                     row = new HtmlTableRow();
+                    row.Cells.Add(new HtmlTableCell { InnerText = count.ToString() });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.assignedto });
+                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.company });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.batchid });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.ticketno });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.ticketdate.ToShortDateString() });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.tickettime.ToString() });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.ticketstatus});
+                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.rejectremark });
+                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.resolveddate.ToString() });
+
+                    if (objreport.resolveddate == null)
+                    {
+                        var diff = (DateTime.Now - objreport.createddate);
+                        var hours = Math.Round(diff.Value.TotalHours, 2);
+                        row.Cells.Add(new HtmlTableCell { InnerText = hours.ToString() });
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.sla });
+                    }
+                    else
+                    {
+                        var diff = (objreport.resolveddate - objreport.createddate);
+                        var hours = Math.Round(diff.Value.TotalHours,2);
+                        row.Cells.Add(new HtmlTableCell { InnerText = hours.ToString() });
+
+                        if (objreport.ticketype == "PICKUP")
+                        {
+                            if (hours <=2)
+                            {
+                                row.Cells.Add(new HtmlTableCell { InnerText = "Within TAT" });
+                            }
+                            else
+                            {
+                                row.Cells.Add(new HtmlTableCell { InnerText = "After TAT" });
+                            }
+                        }
+                        else
+                        {
+                            if (hours <= 4)
+                            {
+                                row.Cells.Add(new HtmlTableCell { InnerText = "Within TAT" });
+                            }
+                            else
+                            {
+                                row.Cells.Add(new HtmlTableCell { InnerText = "After TAT" });
+                            }
+                        }            
+
+                    }
+                    
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.emailfrom });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.emailsubject });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.querytype });
@@ -1120,22 +1396,104 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.clientname });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.area });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.cdpncm });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.wrongclientcode });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualclientcode });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.wrongpickupcode });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualpickupcode });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.wrongcustomeruniquecode });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualcustomeruniquecode });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.wronghcin });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualhcin });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.wrongdispis });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualdispis });
+                    
+                    if (objreport.wrongclientcode=="NA")
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.wrongclientcode });
+                    }
+
+                    if (objreport.actualclientcode == "NA")
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualclientcode });
+                    }
+
+                    if (objreport.wrongpickupcode == "NA")
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.wrongpickupcode });
+                    }
+
+                    if (objreport.actualpickupcode == "NA")
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualpickupcode });
+                    }
+
+                    if (objreport.wrongcustomeruniquecode == "NA")
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.wrongcustomeruniquecode });
+                    }
+
+                    if (objreport.actualcustomeruniquecode == "NA")
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualcustomeruniquecode });
+                    }
+
+                    if (objreport.wronghcin == "NA")
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.wronghcin });
+                    }
+
+                    if (objreport.actualhcin == "NA")
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualhcin });
+                    }
+
+                    if (objreport.wrongdispis == "NA")
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.wrongdispis });
+                    }
+
+                    if (objreport.actualdispis == "NA")
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualdispis });
+                    }
+
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.wrongamt.ToString() });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualamt.ToString() });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.depostiondate.ToString() });
+                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.oldbatchid });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.querystatus });
-                    table.Rows.Add(row);
 
+                    table.Rows.Add(row);
                 }
 
                 using (var sw = new StringWriter())
@@ -1143,118 +1501,214 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                     table.RenderControl(new HtmlTextWriter(sw));
                     html = sw.ToString();
                 }
+
                 return html;
             }
             return html;
         }   
 
-            public string GenerateHtmlResponse(FTWebApi.Models.Ticket objticket)
+         public string GenerateHtmlResponse(FTWebApi.Models.Ticket objticket)
         {
             var table = new HtmlTable();
             var mailMessage = new StringBuilder();
             string html;
+            Int32 count = 0;
 
+            var ticketcount = (from a in DataContext.Tickets
+                               where a.BatchID == objticket.batchno
+                               select a.TicketID).Count();
+
+            var ticketclosecount = (from a in DataContext.Tickets
+                                     where a.BatchID == objticket.batchno & a.querystatus == "Close"
+                                     select a.TicketID).Count();
+
+            if (ticketcount != ticketclosecount)
+            {
+                html = "notallclose";
+                return html;
+            }
+         
             table.Attributes.Add("style", "border: 1px solid;");
 
-            var lstTicket = (from a in DataContext.TicketDetails
-                             join b in DataContext.Tickets on a.TicketID equals b.TicketID
-                             where a.TicketID == objticket.ticketno
-                             select new FTWebApi.Models.ticketdetails
-                             {
-                                 id = a.ID,
-                                 ticketno = a.TicketID,
-                                 pickupdate = a.pickupdate,
-                                 pickupcode = b.pickupcode,
-                                 clientcode = b.clientcode,
-                                 crnno = b.crnno,
-                                 actualhcin = a.actualhcin,
-                                 wronghcin = a.wronghcin,
-                                 actualdispis = a.actualdispis,
-                                 wrongdispis = a.wrongdispis,
-                                 actualamt = a.actualamt,
-                                 wrongamt = a.wrongamt,
-                                 customeruniquecode = a.customeruniquecode,
-                                 wrongpickupcode = a.wrongpickupcode,
-                                 wrongclientcode = a.wrongclientcode,
-                                 wrongcustomeruniquecode = a.wrongcustomeruniquecode,
-                                 depositiondate = a.depostiondate
-                             }).AsQueryable();
 
-
-            if (lstTicket != null)
+            HtmlTableRow row = new HtmlTableRow();
+            //row.Attributes.Add("style", "height: 30px; border: 1px solid;");
+            row.Cells.Add(new HtmlTableCell { InnerText = "SR" });
+            row.Cells[0].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "CMS/SIPL" });
+            row.Cells[1].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "Batch Id" });
+            row.Cells[2].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "Ticket Id" });
+            row.Cells[3].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "Transaction Date" });
+            row.Cells[4].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "Query Type" });
+            row.Cells[5].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "CRN No" });
+            row.Cells[6].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "Customer Unique Code" });
+            row.Cells[7].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "Hub Location" });
+            row.Cells[8].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "Customer Name" });
+            row.Cells[9].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "Client Name" });
+            row.Cells[10].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "Client Code" });
+            row.Cells[11].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "Pickup Code" });
+            row.Cells[12].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            row.Cells.Add(new HtmlTableCell { InnerText = "HCIN No" });
+            row.Cells[13].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+            if (objticket.tickettype == "CREDIT")
             {
-                HtmlTableRow row = new HtmlTableRow();
-                row.Attributes.Add("style", "height: 30px; border: 1px solid;");
-                row.Cells.Add(new HtmlTableCell { InnerText = "Batchno" });
-                row.Cells[0].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText = "Ticketno" });
-                row.Cells[1].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText = "Ticket date" });
-                row.Cells[2].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText = "Ticket Type" });
-                row.Cells[3].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText =  "Responsibility" });
-                row.Cells[4].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText =  "CRN No" });
-                row.Cells[5].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText = "Customer Unique Code" });
-                row.Cells[6].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText = "Hublocation" });
-                row.Cells[7].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText = "Customer Name" });
-                row.Cells[8].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText = "Client Name" });
-                row.Cells[9].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText =  "Client Code" });
-                row.Cells[10].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText = "Pickup Code" });
-                row.Cells[11].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText = "Actual Amt" });
-                row.Cells[12].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText =  "Deposit Slip No" });
-                row.Cells[13].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                row.Cells.Add(new HtmlTableCell { InnerText =  "Remark" });
-                row.Cells[14].Attributes.Add("style", "border-bottom: black thin solid");
-                table.Rows.Add(row);
-                
-                foreach (FTWebApi.Models.ticketdetails objtd in lstTicket)
+                row.Cells.Add(new HtmlTableCell { InnerText = "Wrong Amt" });
+                row.Cells[14].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                row.Cells.Add(new HtmlTableCell { InnerText = "Correct Amt" });
+                row.Cells[15].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                row.Cells.Add(new HtmlTableCell { InnerText = "Wrong Deposit Slip No" });
+                row.Cells[16].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                row.Cells.Add(new HtmlTableCell { InnerText = "Correct Deposit Slip No" });
+                row.Cells[17].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                row.Cells.Add(new HtmlTableCell { InnerText = "Deposition Date" });
+                row.Cells[18].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                row.Cells.Add(new HtmlTableCell { InnerText = "Type of Error" });
+                row.Cells[19].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                row.Cells.Add(new HtmlTableCell { InnerText = "Problem Details" });
+                row.Cells[20].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                row.Cells.Add(new HtmlTableCell { InnerText = "Query Status" });
+                row.Cells[21].Attributes.Add("style", "border-bottom: black thin solid");
+
+            }
+            else
+            {
+                row.Cells.Add(new HtmlTableCell { InnerText = "Correct Amt" });
+                row.Cells[14].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                row.Cells.Add(new HtmlTableCell { InnerText = "Deposit Slip No" });
+                row.Cells[15].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                row.Cells.Add(new HtmlTableCell { InnerText = "Problem Details" });
+                row.Cells[16].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                row.Cells.Add(new HtmlTableCell { InnerText = "Query Status" });
+                row.Cells[17].Attributes.Add("style", "border-bottom: black thin solid");
+            }
+            
+            table.Rows.Add(row);
+
+            var tlist = DataContext.Tickets.Where(x => x.BatchID == objticket.batchno);
+
+            foreach(var ticket in tlist)
+            {
+
+                var lstTicket = (from a in DataContext.TicketDetails
+                                 join b in DataContext.Tickets on a.TicketID equals b.TicketID
+                                 where a.TicketID == ticket.TicketID
+                                 select new FTWebApi.Models.ticketdetails
+                                 {
+                                     id = a.ID,
+                                     ticketno = a.TicketID,
+                                     pickupdate = a.pickupdate,
+                                     pickupcode = a.pickupcode,
+                                     clientcode = a.clientcode,
+                                     crnno = b.crnno,
+                                     actualhcin = a.actualhcin,
+                                     wronghcin = a.wronghcin,
+                                     actualdispis = a.actualdispis,
+                                     wrongdispis = a.wrongdispis,
+                                     actualamt = a.actualamt,
+                                     wrongamt = a.wrongamt,
+                                     customeruniquecode = a.customeruniquecode,
+                                     wrongpickupcode = a.wrongpickupcode,
+                                     wrongclientcode = a.wrongclientcode,
+                                     wrongcustomeruniquecode = a.wrongcustomeruniquecode,
+                                     depositiondate = a.depostiondate
+                                 }).AsQueryable();
+
+
+                if (lstTicket != null)
                 {
-                    row = new HtmlTableRow();
-                    
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.batchno});
-                    row.Cells[0].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.ticketno});
-                    row.Cells[1].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.ticketdate.ToString()});
-                    row.Cells[2].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.tickettype});
-                    row.Cells[3].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.mistakedoneby});
-                    row.Cells[4].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.crnno});
-                    row.Cells[5].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objtd.customeruniquecode});
-                    row.Cells[6].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.hublocation});
-                    row.Cells[7].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.bank});
-                    row.Cells[8].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.client});
-                    row.Cells[9].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.clientcode});
-                    row.Cells[10].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.pickupcode});
-                    row.Cells[11].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objtd.actualamt.ToString()});
-                    row.Cells[12].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objtd.actualdispis });
-                    row.Cells[13].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                    row.Cells.Add(new HtmlTableCell { InnerText = objticket.problem});
-                    row.Cells[14].Attributes.Add("style", "border-bottom: black thin solid");
-                    table.Rows.Add(row);
+                   foreach (FTWebApi.Models.ticketdetails objtd in lstTicket)
+                    {
+                        count++;
+                        row = new HtmlTableRow();
+                        row.Cells.Add(new HtmlTableCell { InnerText = count.ToString() });
+                        row.Cells[0].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = "CMS" });
+                        row.Cells[1].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = ticket.BatchID });
+                        row.Cells[2].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = ticket.TicketID });
+                        row.Cells[3].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = ticket.ticketdate.ToString() });
+                        row.Cells[4].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = ticket.tikcettype });
+                        row.Cells[5].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = ticket.crnno });
+                        row.Cells[6].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = objtd.customeruniquecode });
+                        row.Cells[7].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = ticket.hublocation });
+                        row.Cells[8].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = ticket.customer });
+                        row.Cells[9].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = ticket.client });
+                        row.Cells[10].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = objtd.clientcode });
+                        row.Cells[11].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        row.Cells.Add(new HtmlTableCell { InnerText = objtd.pickupcode });
+                        row.Cells[12].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        if (objtd.actualhcin=="NA")
+                        {
+                            objtd.actualhcin = "";
+                        }
+                        row.Cells.Add(new HtmlTableCell { InnerText = objtd.actualhcin });
+                        row.Cells[13].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                        if (objticket.tickettype == "CREDIT")
+                        {
+                            row.Cells.Add(new HtmlTableCell { InnerText = objtd.wrongamt.ToString() });
+                            row.Cells[14].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                            row.Cells.Add(new HtmlTableCell { InnerText = objtd.actualamt.ToString() });
+                            row.Cells[15].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                            if (objtd.wrongdispis == "NA")
+                            {
+                                objtd.wrongdispis = "";
+                            }
+                            row.Cells.Add(new HtmlTableCell { InnerText = objtd.wrongdispis });
+                            row.Cells[16].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                            if (objtd.actualdispis == "NA")
+                            {
+                                objtd.actualdispis = "";
+                            }
+                            row.Cells.Add(new HtmlTableCell { InnerText = objtd.actualdispis });
+                            row.Cells[17].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                            row.Cells.Add(new HtmlTableCell { InnerText = objtd.depositiondate.ToString() });
+                            row.Cells[18].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                            row.Cells.Add(new HtmlTableCell { InnerText = objticket.errortype.ToString() });
+                            row.Cells[19].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                            row.Cells.Add(new HtmlTableCell { InnerText = ticket.problem });
+                            row.Cells[20].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                            row.Cells.Add(new HtmlTableCell { InnerText = ticket.querystatus });
+                            row.Cells[21].Attributes.Add("style", "border-bottom: black thin solid");
+
+                        }
+                        else
+                        {
+                            row.Cells.Add(new HtmlTableCell { InnerText = objtd.actualamt.ToString() });
+                            row.Cells[14].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                            row.Cells.Add(new HtmlTableCell { InnerText = objtd.actualdispis });
+                            row.Cells[15].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                            row.Cells.Add(new HtmlTableCell { InnerText = ticket.problem });
+                            row.Cells[16].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
+                            row.Cells.Add(new HtmlTableCell { InnerText = ticket.querystatus });
+                        }
+                        //row.Cells[17].Attributes.Add("style", "border-bottom: black thin solid");
+                        table.Rows.Add(row);
+                    }
                 }
+
             }
 
+            
             using (var sw = new StringWriter())
             {
                 table.RenderControl(new HtmlTextWriter(sw));
@@ -1334,6 +1788,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                 bt.EmailBody = objbatch.emailbody;
                 bt.EmailSubject = objbatch.emailsubject;
                 bt.FromEmail = objbatch.fromemail;
+                bt.Emailcc = objbatch.emailcc;
 
                 var count = (from b in DataContext.Batches
                              where b.Date.Value.Year == objbatch.batchdate.Year
@@ -1439,17 +1894,29 @@ public string GetReportData(string fromdate,string todate,string customer, strin
 
             sbatchno = getbatchno();
 
-
+            tc.acceptstatus = objticket.acceptstatus;
             if (objticket.bank != null && objticket.bank != "")
             {
                 if (objticket.assignedto == "" || objticket.assignedto == null)
                 {
-                    assigneduser = (from c in DataContext.usermasters
-                                    join m in DataContext.userbankmaps on c.Userid equals m.Userid
-                                    where m.Bank.Contains(objticket.bank) & m.QueryType == objticket.tickettype & m.UserPriority == "1"
-                                    select c.Userid).SingleOrDefault();
+
+                    if (objticket.tickettype != "")
+                    {
+                        assigneduser = (from c in DataContext.usermasters
+                                        join m in DataContext.userbankmaps on c.Userid equals m.Userid
+                                        where m.Bank.Contains(objticket.bank) & m.QueryType == objticket.tickettype & m.UserPriority == "1"
+                                        select c.Userid).SingleOrDefault();
+                    }
+                    else
+                    {
+                        assigneduser = (from c in DataContext.usermasters
+                                        join m in DataContext.userbankmaps on c.Userid equals m.Userid
+                                        where m.Bank.Contains(objticket.bank) & m.UserPriority == "1"
+                                        select c.Userid).SingleOrDefault();
+                    }
 
                     tc.assignedto = assigneduser;
+                    tc.querystatus = "Assigned";
                 }
                 else
                 {
@@ -1458,14 +1925,9 @@ public string GetReportData(string fromdate,string todate,string customer, strin
             }
 
             tc.ticketdate = objticket.ticketdate;
-            //tc.ticketdate = DateTime.Parse(objticket.ticketdate);
-            //tc.ticketdate = DateTime.Parse("2021-5-28");
             tc.BatchID = sbatchno;
             tc.tikcettime = objticket.tickettime;
-            //tc.tikcettime = TimeSpan.Parse("12:15");
             tc.tikcettype = objticket.tickettype ;
-            tc.acceptstatus = objticket.acceptstatus;
-            //tc.resolveddate = (DateTime)objticket.resolveddate;
             tc.customer = objticket.bank;
             tc.pickupcode = objticket.pickupcode;
             tc.clientcode = objticket.clientcode;
@@ -1504,8 +1966,6 @@ public string GetReportData(string fromdate,string todate,string customer, strin
             bt.CreatedDate =  DateTime.Now;
 
             DataContext.Batches.Add(bt);
-
-
             DataContext.SaveChanges();
 
         }
@@ -1617,10 +2077,20 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                     tc.querystatus = "Open";
                     if (tmptilist.bank != null && tmptilist.bank != "")
                     {
-                        assigneduser = (from c in DataContext.usermasters
-                                        join m in DataContext.userbankmaps on c.Userid equals m.Userid
-                                        where m.Bank.Contains(tmptilist.bank) & m.QueryType == tmptilist.tickettype & m.UserPriority == "1"
-                                        select c.Userid).SingleOrDefault();
+                        if (tmptilist.tickettype != "")
+                        {
+                            assigneduser = (from c in DataContext.usermasters
+                                            join m in DataContext.userbankmaps on c.Userid equals m.Userid
+                                            where m.Bank.Contains(tmptilist.bank) & m.QueryType == tmptilist.tickettype & m.UserPriority == "1"
+                                            select c.Userid).SingleOrDefault();
+                        }
+                        else
+                        {
+                            assigneduser = (from c in DataContext.usermasters
+                                            join m in DataContext.userbankmaps on c.Userid equals m.Userid
+                                            where m.Bank.Contains(tmptilist.bank) & m.UserPriority == "1"
+                                            select c.Userid).SingleOrDefault();
+                        }
 
                         tc.assignedto = assigneduser;
                         tc.querystatus = "Assigned";
@@ -1646,7 +2116,8 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                                      area = area.LocationName,                                     
                                      customertype = a.AccountType,
                                      cdpncm = j.DepositionType,
-                                     hierarchycode = b.HierarchyCode
+                                     hierarchycode = b.HierarchyCode,
+                                     Company = a.CompanyCode
                                  }).SingleOrDefault();
 
 
@@ -1684,6 +2155,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                         tc.hublocation = crnno.hublocation;
                         tc.customertype = crnno.customertype;
                         tc.hierarchycode = crnno.hierarchycode;
+                        tc.Company = crnno.Company;
                     }
                     else
                     {

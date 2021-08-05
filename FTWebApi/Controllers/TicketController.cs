@@ -12,6 +12,8 @@ using System.Web;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Text;
+using ExcelDataReader;
+using System.Data;
 
 namespace FTWebApi.Controllers
 {
@@ -33,7 +35,7 @@ namespace FTWebApi.Controllers
                 foreach (string file in httpRequest.Files)
                 {
                     var postedFile = httpRequest.Files[file];
-                    filePath = HttpContext.Current.Server.MapPath("~/" + postedFile.FileName);
+                    filePath = HttpContext.Current.Server.MapPath("~/uploadfiles/" + postedFile.FileName);
                     FileName = postedFile.FileName;
                     postedFile.SaveAs(filePath);
                     docfiles.Add(filePath);
@@ -50,7 +52,162 @@ namespace FTWebApi.Controllers
             return result;
         }
 
-        
+        [HttpPost]
+        public HttpResponseMessage UploadExcelFile()
+        {
+            HttpResponseMessage result = null;
+            
+            var httpRequest = HttpContext.Current.Request;
+            Stream FileStream = null;
+            DataSet dsexcelRecords = new DataSet();
+            IExcelDataReader reader = null;
+            string message = "";
+            List<FTWebApi.Models.Ticket> lstTicket = new List<FTWebApi.Models.Ticket>();
+
+            if (httpRequest.Files.Count > 0)
+            {
+                var docfiles = new List<string>();
+                foreach (string file in httpRequest.Files)
+                {
+                    var postedFile = httpRequest.Files[file];
+                    FileStream = postedFile.InputStream;
+                    if (postedFile != null)
+                    {
+                        if (postedFile.FileName.EndsWith(".xls"))
+                        {
+                            //reader = ExcelReaderFactory.CreateBinaryReader(FileStream);
+                            reader = ExcelReaderFactory.CreateReader(FileStream);
+                            dsexcelRecords = reader.AsDataSet();
+                            reader.Close();
+                        }
+                        else if (postedFile.FileName.EndsWith(".xlsx"))
+                        {
+                            //reader = ExcelReaderFactory.CreateOpenXmlReader(FileStream);
+                            reader = ExcelReaderFactory.CreateReader(FileStream);
+                            
+                            dsexcelRecords = reader.AsDataSet();
+                            reader.Close();
+                        }
+                        else
+                        {
+                            message = "The file format is not supported.";
+                        }
+
+                       
+                        if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+                        {
+                            DataTable dtStudentRecords = dsexcelRecords.Tables[0];
+                            for (int i = 0; i < dtStudentRecords.Rows.Count; i++)
+                            {
+                                FTWebApi.Models.Ticket objticket = new FTWebApi.Models.Ticket();
+                                objticket.crnno = Convert.ToString(dtStudentRecords.Rows[i][0]);
+                                objticket.tickettype = Convert.ToString(dtStudentRecords.Rows[i][1]);
+                                objticket.bank = Convert.ToString(dtStudentRecords.Rows[i][2]);
+                                objticket.emailfrom = Convert.ToString(dtStudentRecords.Rows[i][3]);
+                                objticket.emailsubject = Convert.ToString(dtStudentRecords.Rows[i][4]);
+                                lstTicket.Add(objticket);
+                            }
+                        }
+
+                        dalticketrepo.AddExcelData(lstTicket);
+                        result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
+                    }
+                }    
+            }
+            else
+            {
+                result = Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+            FileStream.Close();
+            return result;
+        }
+
+
+        [HttpPost]
+        public HttpResponseMessage UploadBulkTickeClose()
+        {
+            HttpResponseMessage result = null;
+            var httpRequest = HttpContext.Current.Request;
+            Stream FileStream = null;
+            DataSet dsexcelRecords = new DataSet();
+            IExcelDataReader reader = null;
+            string message = "";
+            List<FTWebApi.Models.Ticket> lstTicket = new List<FTWebApi.Models.Ticket>();
+            List<FTWebApi.Models.ticketdetails> lsttd = new List<FTWebApi.Models.ticketdetails>();
+
+            if (httpRequest.Files.Count > 0)
+            {
+                var docfiles = new List<string>();
+                foreach (string file in httpRequest.Files)
+                {
+                    var postedFile = httpRequest.Files[file];
+                    FileStream = postedFile.InputStream;
+
+                    if (postedFile != null)
+                    {
+                        if (postedFile.FileName.EndsWith(".xls"))
+                        {
+                            //reader = ExcelReaderFactory.CreateBinaryReader(FileStream);
+                            reader = ExcelReaderFactory.CreateReader(FileStream);
+                            dsexcelRecords = reader.AsDataSet();
+                            reader.Close();
+
+                        }
+                        else if (postedFile.FileName.EndsWith(".xlsx"))
+                        {
+                            //reader = ExcelReaderFactory.CreateOpenXmlReader(FileStream);
+                            reader = ExcelReaderFactory.CreateReader(FileStream);
+                            dsexcelRecords = reader.AsDataSet();
+                            reader.Close();
+                        }
+                        else
+                        {
+                            message = "The file format is not supported.";
+                        }
+
+                        
+                        if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
+                        {
+                            DataTable dtStudentRecords = dsexcelRecords.Tables[0];
+                            for (int i = 1; i < dtStudentRecords.Rows.Count; i++)
+                            {
+                                FTWebApi.Models.Ticket objticket = new FTWebApi.Models.Ticket();
+                                FTWebApi.Models.ticketdetails objtd = new FTWebApi.Models.ticketdetails();
+
+                                objticket.batchno = Convert.ToString(dtStudentRecords.Rows[i][0]);
+                                objticket.ticketno = Convert.ToString(dtStudentRecords.Rows[i][1]);
+                                objticket.crnno = Convert.ToString(dtStudentRecords.Rows[i][2]);
+                                objticket.mistakedoneby = Convert.ToString(dtStudentRecords.Rows[i][3]);
+                                objticket.errortype = Convert.ToString(dtStudentRecords.Rows[i][4]);
+                                objticket.problem  = Convert.ToString(dtStudentRecords.Rows[i][8]);
+
+                                objtd.ticketno = Convert.ToString(dtStudentRecords.Rows[i][1]);
+                                objtd.crnno = Convert.ToString(dtStudentRecords.Rows[i][2]);
+                                objtd.pickupdate = DateTime.Parse((dtStudentRecords.Rows[i][5].ToString()));
+                                objtd.actualhcin = Convert.ToString(dtStudentRecords.Rows[i][6]);
+                                objtd.actualamt = Decimal.Parse(dtStudentRecords.Rows[i][7].ToString());
+                                
+                                lstTicket.Add(objticket);
+                                lsttd.Add(objtd);
+                            }
+                        }
+
+                        dalticketrepo.AddExcelCloseData(lstTicket, lsttd);
+                        result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
+                    }
+                }
+            }
+            else
+            {
+                result = Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+            FileStream.Close();
+            //throw new HttpResponseException(response);
+            return result;
+        }
+
+
+
         public HttpResponseMessage Downloadnew(string filepath, string filname)
         {
             HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
@@ -86,19 +243,19 @@ namespace FTWebApi.Controllers
         public HttpResponseMessage Downloadexelfile(string fromdate,string todate,string customer,string user, string customertype,
               string region,string location,string hublocation,string cdpncm,string issuetype,string sla)
         {
-           
-            string html = dalticketrepo.GetReportData(fromdate, todate, customer, user, customertype,region,location,hublocation,cdpncm, issuetype, sla);
-            byte[] bytes = Encoding.ASCII.GetBytes(html);
+                string html = dalticketrepo.GetReportData(fromdate, todate, customer, user, customertype, region, location, hublocation, cdpncm, issuetype, sla);
+                byte[] bytes = Encoding.ASCII.GetBytes(html);
 
-            HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-            var stream = new MemoryStream(bytes);
-            result.Content = new StreamContent(stream);
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
-            {
-                FileName = "TicketTracker.xls"
-            };
-            return result;
+                HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
+                var stream = new MemoryStream(bytes);
+                result.Content = new StreamContent(stream);
+                result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+                {
+                    FileName = "TicketTracker.xls"
+                };
+
+                return result;
         }        
 
 
@@ -400,6 +557,29 @@ namespace FTWebApi.Controllers
         }
 
         [HttpPut]
+        public HttpResponseMessage SendCloseResponse([FromBody] FTWebApi.Models.Ticket objticket)
+        {
+            string html;
+            if (objticket.status == "Close" && objticket.SendAutoCloseResponse == "Y")
+            {
+                html = dalticketrepo.GenerateHtmlResponse(objticket);
+
+                if (html != "notallclose")
+                {
+                    sendemailcloseexcel(html, objticket.emailfrom, objticket.emailsubject, objticket.batchno);
+                }
+
+            }
+
+            var response = new HttpResponseMessage()
+            {
+                StatusCode = HttpStatusCode.OK
+            };
+
+            return response;
+        }
+
+        [HttpPut]
         public HttpResponseMessage UpdateTicket([FromBody] FTWebApi.Models.Ticket objticket)
         {
             string html;
@@ -412,10 +592,14 @@ namespace FTWebApi.Controllers
                     StatusCode = HttpStatusCode.OK
                 };
 
-                if (objticket.status=="Close")
+                if (objticket.status=="Close" && objticket.SendAutoCloseResponse=="Y")
                 {
                     html=dalticketrepo.GenerateHtmlResponse(objticket);
-                    sendemailclose(html, objticket.emailfrom);
+
+                    if (html != "notallclose")
+                    {
+                        sendemailcloseexcel(html, objticket.emailfrom,objticket.emailsubject,objticket.batchno);
+                    }
                 }
 
                 return response;
@@ -449,7 +633,52 @@ namespace FTWebApi.Controllers
             smtp.Send(message);
         }
 
-        [HttpPost]
+
+        private void sendemailcloseexcel(string html, string toemail,string emailsubject,string batchno)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(html);
+            var stream = new MemoryStream(bytes);
+
+            /*
+            System.Net.Mime.ContentType ct = new System.Net.Mime.ContentType(System.Net.Mime.MediaTypeNames.Application.Octet);
+            System.Net.Mail.Attachment attach = new System.Net.Mail.Attachment(stream, ct);
+            attach.ContentDisposition.FileName = "ExcelResponse.xsl";
+            Response.ContentType = "application/x-msexcel"; 
+            Response.AddHeader("Content-Disposition", "attachment;
+            filename=ExcelFile.xls");
+            Response.ContentEncoding = Encoding.UTF8;
+            */
+
+            string msgsubject = "";
+            string msgbody = "";
+          
+            msgsubject = "Closed-"+batchno + " " + emailsubject;
+
+            msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td>Your query has been closed vide batch no. " + batchno +
+                       " and detailed report attached for your quick reference. </td></tr><tr><td>Please note the interaction number for future reference.</tr></td><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
+
+            MailMessage message = new MailMessage();
+            SmtpClient smtp = new SmtpClient();
+            message.From = new MailAddress("rcmuatquery@cms.com");
+            message.To.Add(new MailAddress(toemail));
+            message.Subject = msgsubject;
+            message.IsBodyHtml = true; //to make message body as html  
+            message.Body = msgbody;
+            message.Attachments.Add(new Attachment(stream, "ExcelResponse.xls", "application/x-msexcel"));
+            //message.Attachments.Add(new Attachment(stream, "ExcelResponse.xls", "application/vnd.ms-excel"));
+            //message.Attachments.Add(new Attachment(stream, "ExcelResponse.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            smtp.Port = 587;
+            smtp.Host = "sampark.cms.com"; //for gmail host  
+            smtp.EnableSsl = true;
+            smtp.UseDefaultCredentials = false;
+            smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+            smtp.Send(message);
+            stream.Close();
+        }
+
+
+            [HttpPost]
         public HttpResponseMessage InsertTicketDetails([FromBody] FTWebApi.Models.ticketdetails[] objticketdetails)
         {
             try

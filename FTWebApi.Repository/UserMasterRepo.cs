@@ -105,7 +105,21 @@ namespace FTWebApi.Repository
             }
 
         }
-        
+
+        public void UpdatePassword(FTWebApi.Models.user objUserMaster)
+        {
+
+            usermaster ddUserMaster = (from c in DataContext.usermasters
+                                       where c.Userid == objUserMaster.UserId
+                                       select c).FirstOrDefault();
+
+            ddUserMaster.UserPassword = objUserMaster.Password;
+
+            DataContext.SaveChanges();
+
+        }
+
+
         public void UpdatePlan(FTWebApi.Models.UserMaster objUserMaster)
         {
             userbankmap ub;
@@ -151,6 +165,25 @@ namespace FTWebApi.Repository
             {
                 throw ec;
             }
+        }
+        public IQueryable<FTWebApi.Models.bank> GetAllBanks()
+        {
+            var banklist = (from a in DataContext.BankMasters
+                            select new FTWebApi.Models.bank
+                            {
+                                bankname = a.Bank,
+                                bankdomain = a.Bank
+                            }).AsQueryable();
+            return banklist;
+        }
+
+        public void AddBank(string BankName)
+        {
+            BankMaster bm = new BankMaster();
+            bm.Bank = BankName;
+
+            DataContext.BankMasters.Add(bm);
+            DataContext.SaveChanges();
         }
         public void InsertPlan(FTWebApi.Models.UserMaster objUserMaster)
         {

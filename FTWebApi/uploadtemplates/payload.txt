@@ -1,0 +1,18 @@
+[{"ticketno":"","ticketdate":"2021-6-8","tickettime":"11:00","tickettype":"Credit","assignedto":"","batchno":"B0111","acceptstatus":"Accept","resolveddate":"2021-6-7", "emailsubject":"","emailfrom":"","bank":"Axis Bank","pickupcode":"SEC32","clientcode":"SERVNIKO","crnno":"","area":"", "cdpncm":"","region": "","location": "","hublocation":"","problem":"Proble descirption","mistakedoneby":"location","errortype":"","status": "Open","createduser":"","createddate":"2021-6-7","modifieduser":"","modifieddate":"2021-6-7","actualamt":"2000","wrongamt":"3000","actualdispis":"","actualhcin":"5555","wrongdispis":"","wronghcin":"4444","pickupdate":"2021-6-8"}]
+
+
+[{"ticketno":"","ticketdate":"2021-5-31","tickettime":"11:00","tickettype":"Credit","assignedto":"Arv","batchno":"B0001","acceptstatus":"Accept","resolveddate":"2021-5-31", "emailsubject":"","emailfrom":"","bank":"Axis Bank","pickupcode":"P0001","clientcode":"C0001","crnno":"CRN001","area":"A0001", "cdpncm":"","region": "","location": "","hublocation":"","problem":"Proble descirption","mistakedoneby":"location","errortype":"","status": "close","createduser":"","createddate":"2021-5-31","modifieduser":"","modifieddate":"2021-5-31"}]
+
+{"batchid":"","fromemail": "Vrashab Kotian <vrashab.kotian@oneture.com>", "emailsubject": "New Pickup not started (Discontinuation )-->TATA AIG GENERAL", "emailbody": "/home/oneture/work/Email/VrashabKotianvrashabkotianoneturecom_2021-05-31-13-02-26", "batchdate": "2021-05-31 13:02:27.080040"}
+
+
+http://cmsliveuat.cms.com/rcmquery/api/ticket/insertbatch
+
+http://localhost:50900/api/ticket/InsertTicketBulk
+
+[{"ticketno":"","ticketdate":"2021-6-7","tickettime":"11:00","tickettype":"Credit","assignedto":"","batchno":"B0111","acceptstatus":"Accept","resolveddate":"2021-6-7", "emailsubject":"","emailfrom":"","bank":"Axis Bank","pickupcode":"P0001","clientcode":"","crnno":"","area":"", "cdpncm":"","region": "","location": "","hublocation":"","problem":"Proble descirption","mistakedoneby":"location","errortype":"","status": "open","createduser":"","createddate":"2021-6-7","modifieduser":"","modifieddate":"2021-6-7","actualamt":"2000","wrongamt":"3000","actualdispis":"","actualhcin":"","wrongdispis":"","wronghcin":"","pickupdate":"2021-6-7"}]
+
+
+http://localhost:50900/api/ticket/insertbatch
+
+{"batchid":"","fromemail": "vrashab kotian <vrashab.kotian@oneture.com>", "emailsubject": "New Pickup not started (Discontinuation )-->TATA AIG GENERAL", "emailbody": "/home/oneture/work/Email/VrashabKotianvrashabkotianoneturecom_2021-05-31-13-02-26", "batchdate": "2021-06-07 13:02:27.080040"}

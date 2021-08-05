@@ -129,6 +129,12 @@ namespace FTWebApi.Controllers
         }
 
         [HttpGet]
+        public IQueryable<FTWebApi.Models.bank> GetAllBanks()
+        {
+            return dalUserRepo.GetAllBanks();
+        }
+
+        [HttpGet]
         public Int32 ValidatePriorityUser(string bank,string querytype,string userid)
         {
             return dalUserRepo.ValidatePriorityUser(bank,querytype,userid);
@@ -194,7 +200,32 @@ namespace FTWebApi.Controllers
             }
         }
 
-       
+        [HttpPost]
+        public HttpResponseMessage UpdatePassword([FromBody] FTWebApi.Models.user objUserMaster)
+        {
+            try
+            {
+
+                dalUserRepo.UpdatePassword(objUserMaster);
+
+                var response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK
+                };
+
+                return response;
+
+            }
+            catch (Exception)
+            {
+                var response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+                return response;
+            }
+        }
+
 
         [HttpPost]
         public HttpResponseMessage SaveUser([FromBody]  FTWebApi.Models.UserMaster obum)
@@ -223,5 +254,30 @@ namespace FTWebApi.Controllers
         }
 
 
+        [HttpGet]
+        public HttpResponseMessage AddBank(string bankname)
+        {
+            try
+            {
+
+                dalUserRepo.AddBank(bankname);
+
+                var response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK
+                };
+
+                return response;
+
+            }
+            catch (Exception)
+            {
+                var response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+                return response;
+            }
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace FTWebApi.Models
         public string fromemail { get; set; }
         public string emailsubject { get; set; }
         public string emailbody { get; set; }
-
+        public string emailcc { get; set; }
     }
 }
 

@@ -55,6 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="bank.cs" />
     <Compile Include="batch.cs" />
     <Compile Include="CorrectAns.cs" />
     <Compile Include="email.cs" />

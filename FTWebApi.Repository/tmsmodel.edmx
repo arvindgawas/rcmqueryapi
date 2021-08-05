@@ -28,6 +28,7 @@
           <Property Name="ModifiedDate" Type="datetime" />
           <Property Name="acceptstatus" Type="varchar" MaxLength="50" />
           <Property Name="oldbatchid" Type="varchar" MaxLength="50" />
+          <Property Name="Emailcc" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="ErrorType">
           <Key>
@@ -101,6 +102,7 @@
           <Property Name="filepath" Type="varchar(max)" />
           <Property Name="filename" Type="varchar" MaxLength="50" />
           <Property Name="rejectremark" Type="varchar" MaxLength="500" />
+          <Property Name="Company" Type="varchar" MaxLength="10" />
         </EntityType>
         <EntityType Name="TicketDetails">
           <Key>
@@ -190,6 +192,7 @@
           <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
           <Property Name="acceptstatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="oldbatchid" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Emailcc" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="ErrorType">
           <Key>
@@ -244,6 +247,7 @@
           <Property Name="filepath" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
           <Property Name="filename" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="rejectremark" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="Company" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="TicketDetail">
           <Key>
@@ -348,6 +352,7 @@
           <EntitySetMapping Name="Batches">
             <EntityTypeMapping TypeName="RCMQueryModel.Batch">
               <MappingFragment StoreEntitySet="Batch">
+                <ScalarProperty Name="Emailcc" ColumnName="Emailcc" />
                 <ScalarProperty Name="oldbatchid" ColumnName="oldbatchid" />
                 <ScalarProperty Name="acceptstatus" ColumnName="acceptstatus" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
@@ -385,6 +390,7 @@
           <EntitySetMapping Name="Tickets">
             <EntityTypeMapping TypeName="RCMQueryModel.Ticket">
               <MappingFragment StoreEntitySet="Ticket">
+                <ScalarProperty Name="Company" ColumnName="Company" />
                 <ScalarProperty Name="rejectremark" ColumnName="rejectremark" />
                 <ScalarProperty Name="filename" ColumnName="filename" />
                 <ScalarProperty Name="filepath" ColumnName="filepath" />

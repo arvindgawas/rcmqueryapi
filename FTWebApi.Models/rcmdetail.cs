@@ -18,5 +18,6 @@ namespace FTWebApi.Models
         public string customertype { get; set; }
         public string hierarchycode { get; set; }
         public string pickupcode { get; set; }
+        public string Company { get; set; }
     }
 }

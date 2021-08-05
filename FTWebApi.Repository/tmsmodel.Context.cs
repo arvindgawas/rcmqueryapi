@@ -15,9 +15,7 @@ namespace FTWebApi.Repository
     
     public partial class TMSEntitiesnew : DbContext
     {
-
         Type providerService = typeof(System.Data.Entity.SqlServer.SqlProviderServices);
-
         public TMSEntitiesnew()
             : base("name=TMSEntitiesnew")
         {

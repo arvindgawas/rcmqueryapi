@@ -20,6 +20,7 @@ namespace FTWebApi.Models
         public DateTime resolveddate { get; set; }
         public string emailsubject { get; set; }
         public string emailfrom { get; set; }
+        public string emailcc { get; set; }
         public string emailbody { get; set; }
         public string bank { get; set; }
         public string pickupcode { get; set; }
@@ -40,10 +41,12 @@ namespace FTWebApi.Models
         public string rejectremark { get; set; }
         public string filepath { get; set; }
         public string filename { get; set; }
+        public string SendAutoCloseResponse { get; set; }
         public string createduser { get; set; }
         public DateTime createddate { get; set; }
         public string modifieduser { get; set; }
         public DateTime modifieddate { get; set; }
+        public string company { get; set; }
 
     }
 }
