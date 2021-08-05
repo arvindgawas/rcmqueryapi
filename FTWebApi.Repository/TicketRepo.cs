@@ -1273,7 +1273,6 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                                  company = b.Company,
                                  rejectremark = b.rejectremark,
                                  oldbatchid = c.oldbatchid,
-                                 //aging = b.CreatedDate - b.resolveddate,
                                  aging = 0,
                                  sla = ""
                              });
