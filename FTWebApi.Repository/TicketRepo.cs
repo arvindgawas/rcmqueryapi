@@ -21,8 +21,86 @@ namespace FTWebApi.Repository
         TMSEntitiesnew DataContext = new TMSEntitiesnew();
         rcmentities rcmDataContext = new rcmentities();
 
-
         public List<FTWebApi.Models.ticketcount> getadmindashboardcount(string userid, DateTime dtticketdate)
+        {
+
+            FTWebApi.Models.ticketcount objticketcount;
+            Int32 acceptcount, duplicatecount, rejectcount, opencount, closecount, totalcount;
+
+            List<FTWebApi.Models.ticketcount> objticketcountlst = new List<FTWebApi.Models.ticketcount>();
+
+            var ticketgroup = (from t in DataContext.Tickets
+                               where  t.assignedto != null
+                               group t by new
+                               {
+                                   t.customer,
+                                   t.assignedto
+                               }
+                               into customergroup
+                               select new
+                               {
+                                   Bankkey = customergroup.Key.customer,
+                                   Userkey = customergroup.Key.assignedto
+                                   // grouplist = customergroup.ToList()
+                               });
+
+
+            foreach (var tgroup in ticketgroup)
+            {
+                objticketcount = new ticketcount();
+                acceptcount = 0;
+                duplicatecount = 0;
+                rejectcount = 0;
+                opencount = 0;
+                closecount = 0;
+                totalcount = 0;
+
+                acceptcount = (from ts in DataContext.Tickets
+                               where ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Accept"
+                               && ts.customer == tgroup.Bankkey && !ts.querystatus.Contains("Close")
+                               select ts.TicketID).Count();
+                duplicatecount = (from ts in DataContext.Tickets
+                                  where  ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Duplicate"
+                                  && ts.customer == tgroup.Bankkey && !ts.querystatus.Contains("Close")
+                                  select ts.TicketID).Count();
+                rejectcount = (from ts in DataContext.Tickets
+                               where  ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Reject"
+                               && ts.customer == tgroup.Bankkey && !ts.querystatus.Contains("Close")
+                               select ts.TicketID).Count();
+                opencount = (from ts in DataContext.Tickets
+                             where  ts.assignedto == tgroup.Userkey && ts.querystatus == "Open"
+                             && !ts.acceptstatus.Contains("Reject") && !ts.acceptstatus.Contains("Duplicate") && !ts.querystatus.Contains("Close")
+                             && ts.customer == tgroup.Bankkey
+                             select ts.TicketID).Count();
+                closecount = (from ts in DataContext.Tickets
+                              where  ts.assignedto == tgroup.Userkey && ts.querystatus == "Close"
+                              && ts.customer == tgroup.Bankkey
+                              select ts.TicketID).Count();
+                totalcount = (from ts in DataContext.Tickets
+                              where  ts.assignedto == tgroup.Userkey
+                              && !ts.acceptstatus.Contains("Reject") && !ts.acceptstatus.Contains("Duplicate") && !ts.querystatus.Contains("Close")
+                              && ts.customer == tgroup.Bankkey
+                              select ts.TicketID).Count();
+
+                objticketcount.bank = tgroup.Bankkey;
+                objticketcount.userid = tgroup.Userkey;
+                objticketcount.acceptcount = acceptcount;
+                objticketcount.duplicatecount = duplicatecount;
+                objticketcount.rejectcount = rejectcount;
+                objticketcount.opencount = opencount;
+                objticketcount.closecount = closecount;
+                objticketcount.totalcount = totalcount;
+                objticketcount.pendingcount = totalcount;
+
+                objticketcountlst.Add(objticketcount);
+
+            }
+
+            return objticketcountlst;
+         
+        }
+
+        public List<FTWebApi.Models.ticketcount> getadmindashboardcountold(string userid, DateTime dtticketdate)
         {
 
             FTWebApi.Models.ticketcount objticketcount;
@@ -58,7 +136,7 @@ namespace FTWebApi.Repository
 
                 acceptcount = (from ts in DataContext.Tickets
                                where ts.ticketdate == dtticketdate && ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Accept"
-                               && ts.customer == tgroup.Bankkey 
+                               && ts.customer == tgroup.Bankkey
                                select ts.TicketID).Count();
                 duplicatecount = (from ts in DataContext.Tickets
                                   where ts.ticketdate == dtticketdate && ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Duplicate"
@@ -97,8 +175,9 @@ namespace FTWebApi.Repository
 
             return objticketcountlst;
 
-         
+
         }
+
 
         public List<FTWebApi.Models.ticketcount> getdashboardcount(string userid,DateTime dtticketdate)
         {
@@ -109,7 +188,7 @@ namespace FTWebApi.Repository
             List<FTWebApi.Models.ticketcount> objticketcountlst = new List<FTWebApi.Models.ticketcount>();
 
             var ticketgroup = (from t in DataContext.Tickets
-                               where t.ticketdate == dtticketdate && t.assignedto == userid
+                               where t.assignedto == userid
                                group t by t.customer into customergroup
                                select new
                                {
@@ -129,29 +208,103 @@ namespace FTWebApi.Repository
                 totalcount = 0;
 
                 acceptcount = (from ts in DataContext.Tickets
-                                   where ts.ticketdate == dtticketdate && ts.assignedto == userid && ts.acceptstatus == "Accept"
+                                   where  ts.assignedto == userid && ts.acceptstatus == "Accept"
+                                   && !ts.acceptstatus.Contains("Reject") && !ts.acceptstatus.Contains("Duplicate") && !ts.querystatus.Contains("Close")
                                    && ts.customer == tgroup.Key
                                    select ts.TicketID).Count();
                 duplicatecount = (from ts in DataContext.Tickets
-                                   where ts.ticketdate == dtticketdate && ts.assignedto == userid && ts.acceptstatus == "Duplicate"
+                                   where  ts.assignedto == userid && ts.acceptstatus == "Duplicate"
                                    && ts.customer == tgroup.Key
                                    select ts.TicketID).Count();
                 rejectcount = (from ts in DataContext.Tickets
-                                      where ts.ticketdate == dtticketdate && ts.assignedto == userid && ts.acceptstatus == "Reject"
+                                      where  ts.assignedto == userid && ts.acceptstatus == "Reject"
                                       && ts.customer == tgroup.Key
                                       select ts.TicketID).Count();
                 opencount = (from ts in DataContext.Tickets
-                                   where ts.ticketdate == dtticketdate && ts.assignedto == userid && ts.querystatus == "Open"
+                                   where  ts.assignedto == userid && ts.querystatus == "Open"
+                                   && !ts.acceptstatus.Contains("Reject") && !ts.acceptstatus.Contains("Duplicate") && !ts.querystatus.Contains("Close")
                                    && ts.customer == tgroup.Key
                                    select ts.TicketID).Count();
                 closecount = (from ts in DataContext.Tickets
-                                 where ts.ticketdate == dtticketdate && ts.assignedto == userid && ts.querystatus == "Close"
+                                 where ts.assignedto == userid && ts.querystatus == "Close"
                                  && ts.customer == tgroup.Key
                                  select ts.TicketID).Count();
                  totalcount = (from ts in DataContext.Tickets
-                                  where ts.ticketdate == dtticketdate && ts.assignedto == userid 
+                                  where ts.assignedto == userid
+                                  && !ts.acceptstatus.Contains("Reject") && !ts.acceptstatus.Contains("Duplicate") && !ts.querystatus.Contains("Close")
                                   && ts.customer == tgroup.Key
                                   select ts.TicketID).Count();
+
+                objticketcount.bank = tgroup.Key;
+                objticketcount.userid = userid;
+                objticketcount.acceptcount = acceptcount;
+                objticketcount.duplicatecount = duplicatecount;
+                objticketcount.rejectcount = rejectcount;
+                objticketcount.opencount = opencount;
+                objticketcount.closecount = closecount;
+                objticketcount.totalcount = totalcount;
+                objticketcount.pendingcount = totalcount ;
+                objticketcountlst.Add(objticketcount);
+
+                }
+
+            return objticketcountlst;
+
+            
+        }
+
+        public List<FTWebApi.Models.ticketcount> getdashboardcountold(string userid, DateTime dtticketdate)
+        {
+
+            FTWebApi.Models.ticketcount objticketcount;
+            Int32 acceptcount, duplicatecount, rejectcount, opencount, closecount, totalcount;
+
+            List<FTWebApi.Models.ticketcount> objticketcountlst = new List<FTWebApi.Models.ticketcount>();
+
+            var ticketgroup = (from t in DataContext.Tickets
+                               where t.ticketdate == dtticketdate && t.assignedto == userid
+                               group t by t.customer into customergroup
+                               select new
+                               {
+                                   Key = customergroup.Key
+                                   // grouplist = customergroup.ToList()
+                               });
+
+
+            foreach (var tgroup in ticketgroup)
+            {
+                objticketcount = new ticketcount();
+                acceptcount = 0;
+                duplicatecount = 0;
+                rejectcount = 0;
+                opencount = 0;
+                closecount = 0;
+                totalcount = 0;
+
+                acceptcount = (from ts in DataContext.Tickets
+                               where ts.ticketdate == dtticketdate && ts.assignedto == userid && ts.acceptstatus == "Accept"
+                               && ts.customer == tgroup.Key
+                               select ts.TicketID).Count();
+                duplicatecount = (from ts in DataContext.Tickets
+                                  where ts.ticketdate == dtticketdate && ts.assignedto == userid && ts.acceptstatus == "Duplicate"
+                                  && ts.customer == tgroup.Key
+                                  select ts.TicketID).Count();
+                rejectcount = (from ts in DataContext.Tickets
+                               where ts.ticketdate == dtticketdate && ts.assignedto == userid && ts.acceptstatus == "Reject"
+                               && ts.customer == tgroup.Key
+                               select ts.TicketID).Count();
+                opencount = (from ts in DataContext.Tickets
+                             where ts.ticketdate == dtticketdate && ts.assignedto == userid && ts.querystatus == "Open"
+                             && ts.customer == tgroup.Key
+                             select ts.TicketID).Count();
+                closecount = (from ts in DataContext.Tickets
+                              where ts.ticketdate == dtticketdate && ts.assignedto == userid && ts.querystatus == "Close"
+                              && ts.customer == tgroup.Key
+                              select ts.TicketID).Count();
+                totalcount = (from ts in DataContext.Tickets
+                              where ts.ticketdate == dtticketdate && ts.assignedto == userid
+                              && ts.customer == tgroup.Key
+                              select ts.TicketID).Count();
 
                 objticketcount.bank = tgroup.Key;
                 objticketcount.userid = userid;
@@ -164,11 +317,11 @@ namespace FTWebApi.Repository
                 objticketcount.pendingcount = totalcount - closecount;
                 objticketcountlst.Add(objticketcount);
 
-                }
+            }
 
             return objticketcountlst;
 
-            
+
         }
         public FTWebApi.Models.ddlisttracker getddlisttracker()
         {
@@ -461,7 +614,7 @@ namespace FTWebApi.Repository
                     Ticket tc = new Ticket();
 
                     tc.TicketID = ticketno;
-
+                    tc.querystatus = "Open";
                     if (objticket.bank != null && objticket.bank != "")
                     {
                         if (objticket.tickettype != "")
@@ -501,7 +654,6 @@ namespace FTWebApi.Repository
                     tc.hublocation = newticket.hublocation;
                     tc.customertype = newticket.customertype;
                     tc.hierarchycode = newticket.hierarchycode;
-                    tc.querystatus = "Open";
                     tc.CreatedBy = "";
                     tc.CreatedDate = DateTime.Now;
 
@@ -614,68 +766,132 @@ namespace FTWebApi.Repository
             return lstTicket;
         }
 
-        public IQueryable<FTWebApi.Models.Ticket> GetAllTicketsfordate(string datefilter, string userid, string userrole)
+        public IQueryable<FTWebApi.Models.Ticket> GetAllTicketsfordate(string datefilter, string userid, string userrole,string filter)
         {
             //join b in DataContext.Batches on a.BatchID equals b.BatchID
             //emailsubject = b.EmailSubject,s
             //emailfrom =b.FromEmail,
 
+            string sfilter = "";
+
             DateTime dt = DateTime.Parse(datefilter);
             IQueryable<FTWebApi.Models.Ticket> lstTicket;
 
+            sfilter = (filter == "undefined") ? "" : filter;
 
             try
             {
-
+                
                 if (userrole == "admin")
                 {
+                    if (filter=="close" || filter == "reject" || filter == "duplicate")
+                    {
+                        sfilter = filter;
+                    }    
+                    else
+                    {
+                        sfilter = "";
+                    }
 
-                    lstTicket = (from a in DataContext.Tickets
-                                 join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
-                                 from b in ps.DefaultIfEmpty()
-                                 where a.ticketdate == dt
-                                 select new FTWebApi.Models.Ticket
-                                 {
-                                     ticketno = a.TicketID,
-                                     ticketdate = a.ticketdate,
-                                     tickettype = a.tikcettype,
-                                     tickettime = a.tikcettime,
-                                     assignedto = a.assignedto,
-                                     batchno = a.BatchID,
-                                     acceptstatus = a.acceptstatus,
-                                     emailsubject = b.EmailSubject,
-                                     emailfrom = b.FromEmail,
-                                     //resolveddate = (DateTime)a.resolveddate,
-                                     bank = a.customer,
-                                     pickupcode = a.pickupcode,
-                                     clientcode = a.clientcode,
-                                     client = a.client,
-                                     crnno = a.crnno,
-                                     customertype = a.customertype,
-                                     hierarchycode = a.hierarchycode,
-                                     area = a.area,
-                                     cdpncm = a.cdpncm,
-                                     region = a.region,
-                                     location = a.location,
-                                     hublocation = a.hublocation,
-                                     problem = a.problem,
-                                     mistakedoneby = a.mistakedoneby,
-                                     errortype = a.errortype,
-                                     status = a.querystatus,
-                                     rejectremark = a.rejectremark,
-                                     createduser = a.CreatedBy,
-                                     //createddate = (DateTime)a.CreatedDate,
-                                     modifieduser = a.ModifiedBy,
-                                     //modifieddate = (DateTime)a.ModifiedDate
-                                 }).AsQueryable();
+                    if (sfilter=="")
+                    {
+                        lstTicket = (from a in DataContext.Tickets
+                                     join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
+                                     from b in ps.DefaultIfEmpty()
+                                         //where a.ticketdate == dt
+                                     where  !a.acceptstatus.Contains("Reject") && a.acceptstatus != "Duplicate" && !a.querystatus.Contains("Close")
+                                     orderby a.TicketID descending
+                                     select new FTWebApi.Models.Ticket
+                                     {
+                                         ticketno = a.TicketID,
+                                         ticketdate = a.ticketdate,
+                                         tickettype = a.tikcettype,
+                                         tickettime = a.tikcettime,
+                                         assignedto = a.assignedto,
+                                         batchno = a.BatchID,
+                                         acceptstatus = a.acceptstatus,
+                                         emailsubject = b.EmailSubject,
+                                         emailfrom = b.FromEmail,
+                                         //resolveddate = (DateTime)a.resolveddate,
+                                         bank = a.customer,
+                                         pickupcode = a.pickupcode,
+                                         clientcode = a.clientcode,
+                                         client = a.client,
+                                         crnno = a.crnno,
+                                         customertype = a.customertype,
+                                         hierarchycode = a.hierarchycode,
+                                         area = a.area,
+                                         cdpncm = a.cdpncm,
+                                         region = a.region,
+                                         location = a.location,
+                                         hublocation = a.hublocation,
+                                         problem = a.problem,
+                                         mistakedoneby = a.mistakedoneby,
+                                         errortype = a.errortype,
+                                         status = a.querystatus,
+                                         rejectremark = a.rejectremark,
+                                         createduser = a.CreatedBy,
+                                         //createddate = (DateTime)a.CreatedDate,
+                                         modifieduser = a.ModifiedBy,
+                                         //modifieddate = (DateTime)a.ModifiedDate
+                                     }).AsQueryable();
+                    }    
+                    else
+                    {
+                        lstTicket = (from a in DataContext.Tickets
+                                     join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
+                                     from b in ps.DefaultIfEmpty()
+                                         //where a.ticketdate == dt
+                                     where a.acceptstatus.Contains(sfilter) ||  a.querystatus.Contains(sfilter)
+                                     orderby a.TicketID descending
+                                     select new FTWebApi.Models.Ticket
+                                     {
+                                         ticketno = a.TicketID,
+                                         ticketdate = a.ticketdate,
+                                         tickettype = a.tikcettype,
+                                         tickettime = a.tikcettime,
+                                         assignedto = a.assignedto,
+                                         batchno = a.BatchID,
+                                         acceptstatus = a.acceptstatus,
+                                         emailsubject = b.EmailSubject,
+                                         emailfrom = b.FromEmail,
+                                         //resolveddate = (DateTime)a.resolveddate,
+                                         bank = a.customer,
+                                         pickupcode = a.pickupcode,
+                                         clientcode = a.clientcode,
+                                         client = a.client,
+                                         crnno = a.crnno,
+                                         customertype = a.customertype,
+                                         hierarchycode = a.hierarchycode,
+                                         area = a.area,
+                                         cdpncm = a.cdpncm,
+                                         region = a.region,
+                                         location = a.location,
+                                         hublocation = a.hublocation,
+                                         problem = a.problem,
+                                         mistakedoneby = a.mistakedoneby,
+                                         errortype = a.errortype,
+                                         status = a.querystatus,
+                                         rejectremark = a.rejectremark,
+                                         createduser = a.CreatedBy,
+                                         //createddate = (DateTime)a.CreatedDate,
+                                         modifieduser = a.ModifiedBy,
+                                         //modifieddate = (DateTime)a.ModifiedDate
+                                     }).AsQueryable();
+                    }
+                    
                 }
                 else
                 {
+                
+
                     lstTicket = (from a in DataContext.Tickets
                                  join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
                                  from b in ps.DefaultIfEmpty()
-                                 where a.ticketdate == dt && a.assignedto == userid
-                                 && !a.acceptstatus.Contains("Reject") && !a.acceptstatus.Contains("Duplicate") && !a.querystatus.Contains("Close")
+                                 where a.assignedto == userid
+                                 //where a.ticketdate == dt && a.assignedto == userid
+                                 && !a.acceptstatus.Contains("Reject") && a.acceptstatus!="Duplicate" && !a.querystatus.Contains("Close")
+                                 orderby a.TicketID descending
                                  select new FTWebApi.Models.Ticket
                                  {
                                      ticketno = a.TicketID,
@@ -1506,7 +1722,29 @@ public string GetReportData(string fromdate,string todate,string customer, strin
             return html;
         }   
 
-         public string GenerateHtmlResponse(FTWebApi.Models.Ticket objticket)
+        public string getticketclosecount(string batchno)
+        {
+            string sresponse = "";
+
+            var ticketcount = (from a in DataContext.Tickets
+                               where a.BatchID == batchno
+                               select a.TicketID).Count();
+
+            var ticketclosecount = (from a in DataContext.Tickets
+                                    where a.BatchID == batchno & a.querystatus == "Close"
+                                    select a.TicketID).Count();
+
+
+            if (ticketcount == ticketclosecount+1 )
+            {
+                sresponse="allclose";
+            }
+
+            return sresponse;
+        }
+
+
+        public string GenerateHtmlResponse(FTWebApi.Models.Ticket objticket)
         {
             var table = new HtmlTable();
             var mailMessage = new StringBuilder();
@@ -2076,7 +2314,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                     tc.querystatus = "Open";
                     if (tmptilist.bank != null && tmptilist.bank != "")
                     {
-                        if (tmptilist.tickettype != "")
+                        if (tmptilist.tickettype != "" && tmptilist.tickettype !=null)
                         {
                             assigneduser = (from c in DataContext.usermasters
                                             join m in DataContext.userbankmaps on c.Userid equals m.Userid

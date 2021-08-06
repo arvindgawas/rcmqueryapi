@@ -412,6 +412,14 @@ namespace FTWebApi.Controllers
             return "ok";
         }
 
+        [HttpGet]
+        public string getticketclosecount(string batchno)
+        {
+            string result="";
+            result = dalticketrepo.getticketclosecount(batchno);
+            return result;
+        }
+
         private void sendemailaccept(string fromemailid)
         {
             MailMessage message = new MailMessage();
@@ -510,9 +518,9 @@ namespace FTWebApi.Controllers
         }
 
         [HttpGet]
-        public IQueryable<FTWebApi.Models.Ticket> GetAllTicketsfordate(string datefilter, string userid, string userrole)
+        public IQueryable<FTWebApi.Models.Ticket> GetAllTicketsfordate(string datefilter, string userid, string userrole, string filter)
         {
-            return dalticketrepo.GetAllTicketsfordate(datefilter, userid, userrole);
+            return dalticketrepo.GetAllTicketsfordate(datefilter, userid, userrole,filter);
         }
 
         
@@ -566,7 +574,7 @@ namespace FTWebApi.Controllers
 
                 if (html != "notallclose")
                 {
-                    sendemailcloseexcel(html, objticket.emailfrom, objticket.emailsubject, objticket.batchno);
+                    sendemailcloseexcel(html, objticket.emailfrom, objticket.emailsubject, objticket.batchno,objticket.emailcc);
                 }
 
             }
@@ -598,7 +606,7 @@ namespace FTWebApi.Controllers
 
                     if (html != "notallclose")
                     {
-                        sendemailcloseexcel(html, objticket.emailfrom,objticket.emailsubject,objticket.batchno);
+                        sendemailcloseexcel(html, objticket.emailfrom,objticket.emailsubject,objticket.batchno,objticket.emailcc);
                     }
                 }
 
@@ -634,7 +642,7 @@ namespace FTWebApi.Controllers
         }
 
 
-        private void sendemailcloseexcel(string html, string toemail,string emailsubject,string batchno)
+        private void sendemailcloseexcel(string html, string toemail,string emailsubject,string batchno,string emailcc)
         {
             byte[] bytes = Encoding.ASCII.GetBytes(html);
             var stream = new MemoryStream(bytes);
@@ -661,6 +669,12 @@ namespace FTWebApi.Controllers
             SmtpClient smtp = new SmtpClient();
             message.From = new MailAddress("rcmuatquery@cms.com");
             message.To.Add(new MailAddress(toemail));
+            
+            if (emailcc != "" && emailcc != null)
+            {
+                message.CC.Add(new MailAddress(emailcc));
+            }
+
             message.Subject = msgsubject;
             message.IsBodyHtml = true; //to make message body as html  
             message.Body = msgbody;
