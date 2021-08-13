@@ -100,7 +100,7 @@ namespace FTWebApi.Repository
          
         }
 
-        public List<FTWebApi.Models.ticketcount> getadmindashboardcount(string userid, DateTime dtticketdate)
+        public List<FTWebApi.Models.ticketcount> getadmindashboardcount(string userid, DateTime dtticketdate, DateTime todate)
         {
 
             FTWebApi.Models.ticketcount objticketcount;
@@ -109,7 +109,7 @@ namespace FTWebApi.Repository
             List<FTWebApi.Models.ticketcount> objticketcountlst = new List<FTWebApi.Models.ticketcount>();
 
             var ticketgroup = (from t in DataContext.Tickets
-                               where t.ticketdate == dtticketdate && t.assignedto != null
+                               where t.ticketdate >= dtticketdate && t.ticketdate <= todate && t.assignedto != null
                                group t by new
                                {
                                    t.customer,
@@ -135,27 +135,27 @@ namespace FTWebApi.Repository
                 totalcount = 0;
 
                 acceptcount = (from ts in DataContext.Tickets
-                               where ts.ticketdate == dtticketdate && ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Accept"
+                               where ts.ticketdate >= dtticketdate && ts.ticketdate <= todate && ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Accept"
                                && ts.customer == tgroup.Bankkey
                                select ts.TicketID).Count();
                 duplicatecount = (from ts in DataContext.Tickets
-                                  where ts.ticketdate == dtticketdate && ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Duplicate"
+                                  where ts.ticketdate >= dtticketdate && ts.ticketdate <= todate && ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Duplicate"
                                   && ts.customer == tgroup.Bankkey
                                   select ts.TicketID).Count();
                 rejectcount = (from ts in DataContext.Tickets
-                               where ts.ticketdate == dtticketdate && ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Reject"
+                               where ts.ticketdate >= dtticketdate && ts.ticketdate <= todate && ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Reject"
                                && ts.customer == tgroup.Bankkey
                                select ts.TicketID).Count();
                 opencount = (from ts in DataContext.Tickets
-                             where ts.ticketdate == dtticketdate && ts.assignedto == tgroup.Userkey && ts.querystatus == "Open"
+                             where ts.ticketdate >= dtticketdate && ts.ticketdate <= todate && ts.assignedto == tgroup.Userkey && ts.querystatus == "Open"
                              && ts.customer == tgroup.Bankkey
                              select ts.TicketID).Count();
                 closecount = (from ts in DataContext.Tickets
-                              where ts.ticketdate == dtticketdate && ts.assignedto == tgroup.Userkey && ts.querystatus == "Close"
+                              where ts.ticketdate >= dtticketdate && ts.ticketdate <= todate && ts.assignedto == tgroup.Userkey && ts.querystatus == "Close"
                               && ts.customer == tgroup.Bankkey
                               select ts.TicketID).Count();
                 totalcount = (from ts in DataContext.Tickets
-                              where ts.ticketdate == dtticketdate && ts.assignedto == tgroup.Userkey
+                              where ts.ticketdate >= dtticketdate && ts.ticketdate <= todate  && ts.assignedto == tgroup.Userkey
                               && ts.customer == tgroup.Bankkey
                               select ts.TicketID).Count();
 
@@ -179,7 +179,7 @@ namespace FTWebApi.Repository
         }
 
 
-        public List<FTWebApi.Models.ticketcount> getdashboardcount(string userid,DateTime dtticketdate)
+        public List<FTWebApi.Models.ticketcount> getdashboardcount(string userid,DateTime dtticketdate, DateTime todate)
         {
 
             FTWebApi.Models.ticketcount objticketcount;
@@ -761,12 +761,12 @@ namespace FTWebApi.Repository
             return lstTicket;
         }
 
-        public IQueryable<FTWebApi.Models.Ticket> GetAllTicketsfordate(string datefilter, string userid, string userrole,string filter)
+        public IQueryable<FTWebApi.Models.Ticket> GetAllTicketsfordate(string datefilter,string todate, string userid, string userrole,string filter)
         {
             //join b in DataContext.Batches on a.BatchID equals b.BatchID
             //emailsubject = b.EmailSubject,s
             //emailfrom =b.FromEmail,
-            DateTime dt;
+            DateTime dt,dttodate;
             string sfilter = "";
 
             
@@ -839,12 +839,13 @@ namespace FTWebApi.Repository
                     else
                     {
                         dt = DateTime.Parse(datefilter);
+                        dttodate = DateTime.Parse(todate);
                         if (sfilter == "")
                         {
                             lstTicket = (from a in DataContext.Tickets
                                          join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
                                          from b in ps.DefaultIfEmpty()
-                                         where a.ticketdate == dt
+                                         where a.ticketdate >= dt && a.ticketdate <= dttodate
                                          //where  !a.acceptstatus.Contains("Reject") && a.acceptstatus != "Duplicate" && !a.querystatus.Contains("Close")
                                          orderby a.TicketID descending
                                          select new FTWebApi.Models.Ticket
@@ -887,7 +888,7 @@ namespace FTWebApi.Repository
                             lstTicket = (from a in DataContext.Tickets
                                          join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
                                          from b in ps.DefaultIfEmpty()
-                                         where a.ticketdate == dt
+                                         where a.ticketdate >= dt && a.ticketdate <= dttodate
                                          && (a.acceptstatus.Contains(sfilter) || a.querystatus.Contains(sfilter))
                                          orderby a.TicketID descending
                                          select new FTWebApi.Models.Ticket
@@ -926,15 +927,9 @@ namespace FTWebApi.Repository
                                          }).AsQueryable();
                         }
                     }
-
-
-                    
-                    
                 }
                 else
                 {
-                
-
                     lstTicket = (from a in DataContext.Tickets
                                  join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
                                  from b in ps.DefaultIfEmpty()

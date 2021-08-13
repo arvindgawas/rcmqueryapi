@@ -337,17 +337,20 @@ namespace FTWebApi.Controllers
 
 
         [HttpGet]
-        public List<FTWebApi.Models.ticketcount> getdashboardcount(string userid, string dtticketdate)
+        public List<FTWebApi.Models.ticketcount> getdashboardcount(string userid, string dtticketdate,string todate)
         {
-            DateTime dt = DateTime.Parse(dtticketdate);
-            return dalticketrepo.getdashboardcount(userid, dt);
+            DateTime dt, dttodate;
+             dt = DateTime.Parse(dtticketdate);
+             dttodate = DateTime.Parse(todate);
+            return dalticketrepo.getdashboardcount(userid, dt, dttodate);
         }
 
         [HttpGet]
-        public List<FTWebApi.Models.ticketcount> getadmindashboardcount(string userid, string dtticketdate)
+        public List<FTWebApi.Models.ticketcount> getadmindashboardcount(string userid, string dtticketdate, string todate)
         {
             DateTime dt = DateTime.Parse(dtticketdate);
-            return dalticketrepo.getadmindashboardcount(userid, dt);
+            DateTime dttodate = DateTime.Parse(todate);
+            return dalticketrepo.getadmindashboardcount(userid, dt, dttodate);
         }
 
         
@@ -526,9 +529,9 @@ namespace FTWebApi.Controllers
         }
 
         [HttpGet]
-        public IQueryable<FTWebApi.Models.Ticket> GetAllTicketsfordate(string datefilter, string userid, string userrole, string filter)
+        public IQueryable<FTWebApi.Models.Ticket> GetAllTicketsfordate(string datefilter,string todate, string userid, string userrole, string filter)
         {
-            return dalticketrepo.GetAllTicketsfordate(datefilter, userid, userrole,filter);
+            return dalticketrepo.GetAllTicketsfordate(datefilter,todate, userid, userrole,filter);
         }
 
         
