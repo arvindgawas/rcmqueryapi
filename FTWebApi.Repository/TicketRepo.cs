@@ -21,7 +21,7 @@ namespace FTWebApi.Repository
         TMSEntitiesnew DataContext = new TMSEntitiesnew();
         rcmentities rcmDataContext = new rcmentities();
 
-        public List<FTWebApi.Models.ticketcount> getadmindashboardcount(string userid, DateTime dtticketdate)
+        public List<FTWebApi.Models.ticketcount> getadmindashboardcountnew(string userid, DateTime dtticketdate)
         {
 
             FTWebApi.Models.ticketcount objticketcount;
@@ -100,7 +100,7 @@ namespace FTWebApi.Repository
          
         }
 
-        public List<FTWebApi.Models.ticketcount> getadmindashboardcountold(string userid, DateTime dtticketdate)
+        public List<FTWebApi.Models.ticketcount> getadmindashboardcount(string userid, DateTime dtticketdate)
         {
 
             FTWebApi.Models.ticketcount objticketcount;
@@ -209,7 +209,7 @@ namespace FTWebApi.Repository
 
                 acceptcount = (from ts in DataContext.Tickets
                                    where  ts.assignedto == userid && ts.acceptstatus == "Accept"
-                                   && !ts.acceptstatus.Contains("Reject") && !ts.acceptstatus.Contains("Duplicate") && !ts.querystatus.Contains("Close")
+                                   && !ts.acceptstatus.Contains("Reject") && ts.acceptstatus != "Duplicate" && !ts.querystatus.Contains("Close")
                                    && ts.customer == tgroup.Key
                                    select ts.TicketID).Count();
                 duplicatecount = (from ts in DataContext.Tickets
@@ -222,7 +222,7 @@ namespace FTWebApi.Repository
                                       select ts.TicketID).Count();
                 opencount = (from ts in DataContext.Tickets
                                    where  ts.assignedto == userid && ts.querystatus == "Open"
-                                   && !ts.acceptstatus.Contains("Reject") && !ts.acceptstatus.Contains("Duplicate") && !ts.querystatus.Contains("Close")
+                                   && !ts.acceptstatus.Contains("Reject") && ts.acceptstatus != "Duplicate" && !ts.querystatus.Contains("Close")
                                    && ts.customer == tgroup.Key
                                    select ts.TicketID).Count();
                 closecount = (from ts in DataContext.Tickets
@@ -231,7 +231,7 @@ namespace FTWebApi.Repository
                                  select ts.TicketID).Count();
                  totalcount = (from ts in DataContext.Tickets
                                   where ts.assignedto == userid
-                                  && !ts.acceptstatus.Contains("Reject") && !ts.acceptstatus.Contains("Duplicate") && !ts.querystatus.Contains("Close")
+                                  && !ts.acceptstatus.Contains("Reject") && ts.acceptstatus != "Duplicate" && !ts.querystatus.Contains("Close")
                                   && ts.customer == tgroup.Key
                                   select ts.TicketID).Count();
 
@@ -555,31 +555,22 @@ namespace FTWebApi.Repository
 
         }
 
-            public void AddExcelData(List<FTWebApi.Models.Ticket> lstticket)
+        public void AddExcelData(List<FTWebApi.Models.Ticket> lstticket)
         {
             string ticketno = "";
             string assigneduser = "";
             string sbatchno = "";
+            string ssubject = "";
+            string semailfrom = "";
+            sbatchno = getbatchno();
+
 
             foreach (var objticket in lstticket)
             {
-                sbatchno = "";
-                sbatchno = getbatchno();
+                ssubject = objticket.emailsubject;
+                semailfrom = objticket.emailfrom;
 
-                Batch bt = new Batch();
-
-                bt.BatchID = sbatchno;
-                bt.Date = DateTime.Today;
-                bt.EmailBody = "upload";
-                bt.EmailSubject = objticket.emailsubject;
-                bt.FromEmail = objticket.emailfrom;
-                bt.CreatedDate = DateTime.Now;
-
-                DataContext.Batches.Add(bt);
-
-                //DataContext.SaveChanges();
-
-                var ticketlist = (from a in rcmDataContext.ClientCustMasters
+                var newticket = (from a in rcmDataContext.ClientCustMasters
                                   join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
                                   join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
                                   join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
@@ -604,10 +595,8 @@ namespace FTWebApi.Repository
                                       cdpncm = j.DepositionType,
                                       hierarchycode = b.HierarchyCode
 
-                                  }).AsQueryable();
+                                  }).FirstOrDefault();
 
-                foreach (var newticket in ticketlist)
-                {
                     ticketno = genticketno();
                     assigneduser = "";
 
@@ -637,8 +626,6 @@ namespace FTWebApi.Repository
 
                     tc.ticketdate = DateTime.Today;
                     tc.BatchID = sbatchno;
-                    //tc.tikcettime = TimeSpan.Parse(DateTime.Now.ToLongTimeString());
-                    //tc.tikcettime = TimeSpan.Parse("12:15");
                     tc.tikcettime = TimeSpan.Parse(DateTime.Now.ToString("HH:mm:ss"));
                     tc.tikcettype = objticket.tickettype;
                     tc.customer = objticket.bank;
@@ -659,18 +646,26 @@ namespace FTWebApi.Repository
 
                     DataContext.Tickets.Add(tc);
 
-                }
+                
             }
-             DataContext.SaveChanges();
+
+            Batch bt = new Batch();
+            bt.BatchID = sbatchno;
+            bt.Date = DateTime.Today;
+            bt.EmailBody = "upload";
+            bt.EmailSubject = ssubject;
+            bt.FromEmail = semailfrom;
+            bt.CreatedDate = DateTime.Now;
+            DataContext.Batches.Add(bt);
+
+            DataContext.SaveChanges();
 
         }
 
 
         public IQueryable<FTWebApi.Models.Ticket> GetAllTickets(string userid, string userrole)
         {
-            //join b in DataContext.Batches on a.BatchID equals b.BatchID
-            //emailsubject = b.EmailSubject,
-            //emailfrom =b.FromEmail,
+            
             IQueryable<FTWebApi.Models.Ticket> lstTicket;
 
             try
@@ -771,10 +766,10 @@ namespace FTWebApi.Repository
             //join b in DataContext.Batches on a.BatchID equals b.BatchID
             //emailsubject = b.EmailSubject,s
             //emailfrom =b.FromEmail,
-
+            DateTime dt;
             string sfilter = "";
 
-            DateTime dt = DateTime.Parse(datefilter);
+            
             IQueryable<FTWebApi.Models.Ticket> lstTicket;
 
             sfilter = (filter == "undefined") ? "" : filter;
@@ -784,6 +779,7 @@ namespace FTWebApi.Repository
                 
                 if (userrole == "admin")
                 {
+                   
                     if (filter=="close" || filter == "reject" || filter == "duplicate")
                     {
                         sfilter = filter;
@@ -793,12 +789,13 @@ namespace FTWebApi.Repository
                         sfilter = "";
                     }
 
-                    if (sfilter=="")
+                    if (datefilter == null)
                     {
+                        //dt = DateTime.Today;
                         lstTicket = (from a in DataContext.Tickets
                                      join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
                                      from b in ps.DefaultIfEmpty()
-                                         //where a.ticketdate == dt
+                                     //where a.ticketdate == dt
                                      where  !a.acceptstatus.Contains("Reject") && a.acceptstatus != "Duplicate" && !a.querystatus.Contains("Close")
                                      orderby a.TicketID descending
                                      select new FTWebApi.Models.Ticket
@@ -835,50 +832,103 @@ namespace FTWebApi.Repository
                                          modifieduser = a.ModifiedBy,
                                          //modifieddate = (DateTime)a.ModifiedDate
                                      }).AsQueryable();
-                    }    
+
+                        Int32 ncount = lstTicket.Count();
+
+                    }
                     else
                     {
-                        lstTicket = (from a in DataContext.Tickets
-                                     join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
-                                     from b in ps.DefaultIfEmpty()
-                                         //where a.ticketdate == dt
-                                     where a.acceptstatus.Contains(sfilter) ||  a.querystatus.Contains(sfilter)
-                                     orderby a.TicketID descending
-                                     select new FTWebApi.Models.Ticket
-                                     {
-                                         ticketno = a.TicketID,
-                                         ticketdate = a.ticketdate,
-                                         tickettype = a.tikcettype,
-                                         tickettime = a.tikcettime,
-                                         assignedto = a.assignedto,
-                                         batchno = a.BatchID,
-                                         acceptstatus = a.acceptstatus,
-                                         emailsubject = b.EmailSubject,
-                                         emailfrom = b.FromEmail,
-                                         //resolveddate = (DateTime)a.resolveddate,
-                                         bank = a.customer,
-                                         pickupcode = a.pickupcode,
-                                         clientcode = a.clientcode,
-                                         client = a.client,
-                                         crnno = a.crnno,
-                                         customertype = a.customertype,
-                                         hierarchycode = a.hierarchycode,
-                                         area = a.area,
-                                         cdpncm = a.cdpncm,
-                                         region = a.region,
-                                         location = a.location,
-                                         hublocation = a.hublocation,
-                                         problem = a.problem,
-                                         mistakedoneby = a.mistakedoneby,
-                                         errortype = a.errortype,
-                                         status = a.querystatus,
-                                         rejectremark = a.rejectremark,
-                                         createduser = a.CreatedBy,
-                                         //createddate = (DateTime)a.CreatedDate,
-                                         modifieduser = a.ModifiedBy,
-                                         //modifieddate = (DateTime)a.ModifiedDate
-                                     }).AsQueryable();
+                        dt = DateTime.Parse(datefilter);
+                        if (sfilter == "")
+                        {
+                            lstTicket = (from a in DataContext.Tickets
+                                         join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
+                                         from b in ps.DefaultIfEmpty()
+                                         where a.ticketdate == dt
+                                         //where  !a.acceptstatus.Contains("Reject") && a.acceptstatus != "Duplicate" && !a.querystatus.Contains("Close")
+                                         orderby a.TicketID descending
+                                         select new FTWebApi.Models.Ticket
+                                         {
+                                             ticketno = a.TicketID,
+                                             ticketdate = a.ticketdate,
+                                             tickettype = a.tikcettype,
+                                             tickettime = a.tikcettime,
+                                             assignedto = a.assignedto,
+                                             batchno = a.BatchID,
+                                             acceptstatus = a.acceptstatus,
+                                             emailsubject = b.EmailSubject,
+                                             emailfrom = b.FromEmail,
+                                             //resolveddate = (DateTime)a.resolveddate,
+                                             bank = a.customer,
+                                             pickupcode = a.pickupcode,
+                                             clientcode = a.clientcode,
+                                             client = a.client,
+                                             crnno = a.crnno,
+                                             customertype = a.customertype,
+                                             hierarchycode = a.hierarchycode,
+                                             area = a.area,
+                                             cdpncm = a.cdpncm,
+                                             region = a.region,
+                                             location = a.location,
+                                             hublocation = a.hublocation,
+                                             problem = a.problem,
+                                             mistakedoneby = a.mistakedoneby,
+                                             errortype = a.errortype,
+                                             status = a.querystatus,
+                                             rejectremark = a.rejectremark,
+                                             createduser = a.CreatedBy,
+                                             //createddate = (DateTime)a.CreatedDate,
+                                             modifieduser = a.ModifiedBy,
+                                             //modifieddate = (DateTime)a.ModifiedDate
+                                         }).AsQueryable();
+                        }
+                        else
+                        {
+                            lstTicket = (from a in DataContext.Tickets
+                                         join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
+                                         from b in ps.DefaultIfEmpty()
+                                         where a.ticketdate == dt
+                                         && (a.acceptstatus.Contains(sfilter) || a.querystatus.Contains(sfilter))
+                                         orderby a.TicketID descending
+                                         select new FTWebApi.Models.Ticket
+                                         {
+                                             ticketno = a.TicketID,
+                                             ticketdate = a.ticketdate,
+                                             tickettype = a.tikcettype,
+                                             tickettime = a.tikcettime,
+                                             assignedto = a.assignedto,
+                                             batchno = a.BatchID,
+                                             acceptstatus = a.acceptstatus,
+                                             emailsubject = b.EmailSubject,
+                                             emailfrom = b.FromEmail,
+                                             //resolveddate = (DateTime)a.resolveddate,
+                                             bank = a.customer,
+                                             pickupcode = a.pickupcode,
+                                             clientcode = a.clientcode,
+                                             client = a.client,
+                                             crnno = a.crnno,
+                                             customertype = a.customertype,
+                                             hierarchycode = a.hierarchycode,
+                                             area = a.area,
+                                             cdpncm = a.cdpncm,
+                                             region = a.region,
+                                             location = a.location,
+                                             hublocation = a.hublocation,
+                                             problem = a.problem,
+                                             mistakedoneby = a.mistakedoneby,
+                                             errortype = a.errortype,
+                                             status = a.querystatus,
+                                             rejectremark = a.rejectremark,
+                                             createduser = a.CreatedBy,
+                                             //createddate = (DateTime)a.CreatedDate,
+                                             modifieduser = a.ModifiedBy,
+                                             //modifieddate = (DateTime)a.ModifiedDate
+                                         }).AsQueryable();
+                        }
                     }
+
+
+                    
                     
                 }
                 else

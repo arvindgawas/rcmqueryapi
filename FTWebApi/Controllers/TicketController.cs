@@ -97,7 +97,7 @@ namespace FTWebApi.Controllers
                         if (dsexcelRecords != null && dsexcelRecords.Tables.Count > 0)
                         {
                             DataTable dtStudentRecords = dsexcelRecords.Tables[0];
-                            for (int i = 0; i < dtStudentRecords.Rows.Count; i++)
+                            for (int i = 1; i < dtStudentRecords.Rows.Count; i++)
                             {
                                 FTWebApi.Models.Ticket objticket = new FTWebApi.Models.Ticket();
                                 objticket.crnno = Convert.ToString(dtStudentRecords.Rows[i][0]);
