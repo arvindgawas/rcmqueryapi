@@ -420,6 +420,14 @@ namespace FTWebApi.Controllers
             return result;
         }
 
+        [HttpGet]
+        public string checkticketdata(string ticketno)
+        {
+            string result = "";
+            result = dalticketrepo.checkticketdata(ticketno);
+            return result;
+        }
+
         private void sendemailaccept(string fromemailid)
         {
             MailMessage message = new MailMessage();

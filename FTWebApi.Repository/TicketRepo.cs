@@ -617,7 +617,7 @@ namespace FTWebApi.Repository
                     tc.querystatus = "Open";
                     if (objticket.bank != null && objticket.bank != "")
                     {
-                        if (objticket.tickettype != "")
+                        if (objticket.tickettype != "" && objticket.tickettype != null)
                         {
                             assigneduser = (from c in DataContext.usermasters
                                             join m in DataContext.userbankmaps on c.Userid equals m.Userid
@@ -629,7 +629,7 @@ namespace FTWebApi.Repository
                             assigneduser = (from c in DataContext.usermasters
                                             join m in DataContext.userbankmaps on c.Userid equals m.Userid
                                             where m.Bank.Contains(objticket.bank) & m.UserPriority == "1"
-                                            select c.Userid).SingleOrDefault();
+                                            select c.Userid).FirstOrDefault();
                         }
                         tc.assignedto = assigneduser;
                         tc.querystatus = "Assigned";
@@ -1423,6 +1423,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
         {
             DateTime dtfromdate = DateTime.Parse(fromdate);
             DateTime dttodate = DateTime.Parse(todate);
+            DateTime TransactionDate;
             string scustomer;
             string suser;
             string scustomertype;
@@ -1436,13 +1437,14 @@ public string GetReportData(string fromdate,string todate,string customer, strin
             slocation = (location == "undefined") ? null : location;
             shublocation = (hublocation == "undefined") ? null : hublocation;
             scdpncm = (cdpncm == "undefined") ? null : cdpncm;
-            sissuetype = (issuetype == "undefined") ? null : issuetype;
+            sissuetype = (issuetype == "undefined") ? null : issuetype; 
             ssla = (sla == "undefined") ? null : sla;
 
 
             var lstTicket = (from a in DataContext.TicketDetails
                              join b in DataContext.Tickets on a.TicketID equals b.TicketID
                              join c in DataContext.Batches on b.BatchID equals c.BatchID
+                             join d in DataContext.ErrorTypes on b.errortype equals d.ID.ToString()
                              where b.ticketdate >= dtfromdate && b.ticketdate <= dttodate && b.customer == (scustomer ?? b.customer)
                              && b.assignedto == (suser ?? b.assignedto) && b.customertype == (scustomertype ?? b.customertype)
                              && b.region == (sregion ?? b.region) && b.location == (slocation ?? b.location) && b.hublocation == (shublocation ?? b.hublocation)
@@ -1461,13 +1463,14 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                                  emailfrom = c.FromEmail,
                                  emailsubject = c.EmailSubject,
                                  querytype = b.tikcettype,
-                                 typeoferror = b.errortype,
+                                 typeoferror = d.ErrorType1,
                                  problemdetails = b.problem,
                                  region = b.region,
                                  location = b.location,
                                  hublocation = b.hublocation,
                                  customer = b.customer,
                                  customertype = b.customertype,
+                                 transactiondate = a.pickupdate,
                                  crnno = b.crnno,
                                  clientname = b.client,
                                  area = b.area,
@@ -1476,6 +1479,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                                  actualclientcode = a.clientcode,
                                  wrongpickupcode = a.wrongpickupcode,
                                  actualpickupcode = a.pickupcode,
+                                 actualhiecode = b.hierarchycode,
                                  wrongcustomeruniquecode = a.wrongcustomeruniquecode,
                                  actualcustomeruniquecode = a.customeruniquecode,
                                  wronghcin = a.wronghcin,
@@ -1523,6 +1527,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                 row.Cells.Add(new HtmlTableCell { InnerText = "hublocation" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Customer" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Customer type" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Transaction Date" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "CRN no" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Client name" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Area" });
@@ -1531,6 +1536,8 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                 row.Cells.Add(new HtmlTableCell { InnerText = "Actual Clientcode" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Wrong Pickupcode" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Actual Pickupcode" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Wrong Hie Code" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Actual Hie Code" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Wrong Customeruniquecode" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Actual Customeruniquecode" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Wrong Hcin" });
@@ -1563,14 +1570,16 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                     {
                         var diff = (DateTime.Now - objreport.createddate);
                         var hours = Math.Round(diff.Value.TotalHours, 2);
-                        row.Cells.Add(new HtmlTableCell { InnerText = hours.ToString() });
+                        var days = Math.Round(hours / 24, 0);
+                        row.Cells.Add(new HtmlTableCell { InnerText = days.ToString() });
                         row.Cells.Add(new HtmlTableCell { InnerText = objreport.sla });
                     }
                     else
                     {
                         var diff = (objreport.resolveddate - objreport.createddate);
                         var hours = Math.Round(diff.Value.TotalHours,2);
-                        row.Cells.Add(new HtmlTableCell { InnerText = hours.ToString() });
+                        var days = Math.Round(hours / 24, 0);
+                        row.Cells.Add(new HtmlTableCell { InnerText = days.ToString() });
 
                         if (objreport.ticketype == "PICKUP")
                         {
@@ -1607,6 +1616,15 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.hublocation });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.customer });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.customertype });
+                    if (objreport.transactiondate.HasValue)
+                    {
+                        TransactionDate = objreport.transactiondate.Value;
+                        row.Cells.Add(new HtmlTableCell { InnerText = TransactionDate.ToShortDateString() });
+                    }
+                    else
+                    {
+                        row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    }
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.crnno });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.clientname });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.area });
@@ -1656,6 +1674,9 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                     {
                         row.Cells.Add(new HtmlTableCell { InnerText = objreport.wrongcustomeruniquecode });
                     }
+
+                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.actualhiecode });
+                    row.Cells.Add(new HtmlTableCell { InnerText = "" });
 
                     if (objreport.actualcustomeruniquecode == "NA")
                     {
@@ -1743,6 +1764,27 @@ public string GetReportData(string fromdate,string todate,string customer, strin
             return sresponse;
         }
 
+        public string checkticketdata(string ticketno)
+        {
+            string sresponse = "";
+
+            var modifieddate = (from a in DataContext.TicketDetails
+                               where a.TicketID == ticketno
+                               select a.ModifiedDate).SingleOrDefault();
+
+
+
+            if (modifieddate is null)
+            {
+                sresponse = "N";
+            }
+            else
+            {
+                sresponse = "Y";
+            }
+
+            return sresponse;
+        }
 
         public string GenerateHtmlResponse(FTWebApi.Models.Ticket objticket)
         {
@@ -1836,6 +1878,9 @@ public string GetReportData(string fromdate,string todate,string customer, strin
 
             foreach(var ticket in tlist)
             {
+                var error = (from a in DataContext.ErrorTypes
+                             where ticket.errortype == a.ID.ToString()
+                             select a.ErrorType1).SingleOrDefault();
 
                 var lstTicket = (from a in DataContext.TicketDetails
                                  join b in DataContext.Tickets on a.TicketID equals b.TicketID
@@ -1920,7 +1965,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                             row.Cells[17].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
                             row.Cells.Add(new HtmlTableCell { InnerText = objtd.depositiondate.ToString() });
                             row.Cells[18].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
-                            row.Cells.Add(new HtmlTableCell { InnerText = objticket.errortype.ToString() });
+                            row.Cells.Add(new HtmlTableCell { InnerText = error });
                             row.Cells[19].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
                             row.Cells.Add(new HtmlTableCell { InnerText = ticket.problem });
                             row.Cells[20].Attributes.Add("style", "border-bottom: black thin solid;border-right:black thin solid");
@@ -2105,6 +2150,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                 td.depostiondate = objtmp.depositiondate;
                 td.soleid = objtmp.soleid;
                 td.bankbranchlocation = objtmp.bankbranchlocation;
+                td.ModifiedDate = DateTime.Now;
 
                 DataContext.TicketDetails.Add(td);
 
@@ -2119,25 +2165,38 @@ public string GetReportData(string fromdate,string todate,string customer, strin
             string sbatchno = "";
 
             Ticket tc = new Ticket();
+            tc.TicketID = ticketno;
 
-            if (objticket.ticketno == "" || objticket.ticketno is null)
+            if (objticket.batchno == "" || objticket.batchno is null)
             {
-                tc.TicketID = ticketno;
+                sbatchno = getbatchno();
+                tc.BatchID = sbatchno;
+
+                Batch bt = new Batch();
+
+                bt.BatchID = sbatchno;
+                bt.Date = objticket.ticketdate;
+                bt.EmailBody = "EmailBody";
+                bt.EmailSubject = objticket.emailsubject;
+                bt.FromEmail = objticket.emailfrom;
+                bt.Emailcc = objticket.emailcc;
+                bt.CreatedDate = DateTime.Now;
+
+                DataContext.Batches.Add(bt);
             }
             else
             {
-                tc.TicketID = objticket.ticketno;
+                tc.BatchID = objticket.batchno;
             }
 
-            sbatchno = getbatchno();
-
-            tc.acceptstatus = objticket.acceptstatus;
+            tc.acceptstatus = "MAccept";
+            tc.querystatus = "Open";
             if (objticket.bank != null && objticket.bank != "")
             {
                 if (objticket.assignedto == "" || objticket.assignedto == null)
                 {
 
-                    if (objticket.tickettype != "")
+                    if (objticket.tickettype != "" && objticket.tickettype != null)
                     {
                         assigneduser = (from c in DataContext.usermasters
                                         join m in DataContext.userbankmaps on c.Userid equals m.Userid
@@ -2149,7 +2208,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                         assigneduser = (from c in DataContext.usermasters
                                         join m in DataContext.userbankmaps on c.Userid equals m.Userid
                                         where m.Bank.Contains(objticket.bank) & m.UserPriority == "1"
-                                        select c.Userid).SingleOrDefault();
+                                        select c.Userid).FirstOrDefault();
                     }
 
                     tc.assignedto = assigneduser;
@@ -2162,7 +2221,6 @@ public string GetReportData(string fromdate,string todate,string customer, strin
             }
 
             tc.ticketdate = objticket.ticketdate;
-            tc.BatchID = sbatchno;
             tc.tikcettime = objticket.tickettime;
             tc.tikcettype = objticket.tickettype ;
             tc.customer = objticket.bank;
@@ -2180,29 +2238,14 @@ public string GetReportData(string fromdate,string todate,string customer, strin
             tc.problem = objticket.problem;
             tc.mistakedoneby = objticket.mistakedoneby;
             tc.errortype = objticket.errortype;
-            if (objticket.status == "" || objticket.status == null)
-            {
-                tc.querystatus = "Open";
-            }
-            else
-            {
-                tc.querystatus = objticket.status;
-            }
             tc.CreatedBy = objticket.createduser;
             tc.CreatedDate = DateTime.Now;
             
             DataContext.Tickets.Add(tc);
 
-            Batch bt = new Batch();
+            
 
-            bt.BatchID = sbatchno;
-            bt.Date = objticket.ticketdate;
-            bt.EmailBody = "EmailBody";
-            bt.EmailSubject = objticket.emailsubject;
-            bt.FromEmail = objticket.emailfrom;
-            bt.CreatedDate =  DateTime.Now;
 
-            DataContext.Batches.Add(bt);
             DataContext.SaveChanges();
 
         }
@@ -2326,7 +2369,7 @@ public string GetReportData(string fromdate,string todate,string customer, strin
                             assigneduser = (from c in DataContext.usermasters
                                             join m in DataContext.userbankmaps on c.Userid equals m.Userid
                                             where m.Bank.Contains(tmptilist.bank) & m.UserPriority == "1"
-                                            select c.Userid).SingleOrDefault();
+                                            select c.Userid).FirstOrDefault();
                         }
 
                         tc.assignedto = assigneduser;
