@@ -240,6 +240,24 @@ namespace FTWebApi.Controllers
         }
 
         [HttpGet]
+        public HttpResponseMessage getbulkclosedata()
+        {
+            string html = dalticketrepo.getbulkclosedata();
+            byte[] bytes = Encoding.ASCII.GetBytes(html);
+
+            HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
+            var stream = new MemoryStream(bytes);
+            result.Content = new StreamContent(stream);
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileName = "ticketclosure.xls"
+            };
+
+            return result;
+        }
+
+        [HttpGet]
         public HttpResponseMessage Downloadexelfile(string fromdate,string todate,string customer,string user, string customertype,
               string region,string location,string hublocation,string cdpncm,string issuetype,string sla)
         {

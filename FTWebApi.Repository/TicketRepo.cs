@@ -538,17 +538,18 @@ namespace FTWebApi.Repository
                                     where c.TicketID == objticket.ticketno
                                     select c).FirstOrDefault();
 
-                FTWebApi.Models.ticketdetails tdexcel = lsttd.Where(a => a.ticketno == objticket.ticketno).FirstOrDefault();
-
-                td.TicketID = objticket.ticketno;
-                td.pickupcode = tc.pickupcode;
-                td.clientcode = tc.clientcode;
-                td.crnno = tc.crnno;
-                td.pickupdate = tdexcel.pickupdate;
-                td.actualhcin = tdexcel.actualhcin;
-                td.actualamt = tdexcel.actualamt;
-                td.ModifiedDate = DateTime.Now;
-
+                if (td != null)
+                {
+                    FTWebApi.Models.ticketdetails tdexcel = lsttd.Where(a => a.ticketno == objticket.ticketno).FirstOrDefault();
+                    td.TicketID = objticket.ticketno;
+                    td.pickupcode = tc.pickupcode;
+                    td.clientcode = tc.clientcode;
+                    td.crnno = tc.crnno;
+                    td.pickupdate = tdexcel.pickupdate;
+                    td.actualhcin = tdexcel.actualhcin;
+                    td.actualamt = tdexcel.actualamt;
+                    td.ModifiedDate = DateTime.Now;
+                }
                 DataContext.SaveChanges();
 
             }
@@ -1463,8 +1464,61 @@ namespace FTWebApi.Repository
             return html;
         }
 
-public string GetReportData(string fromdate,string todate,string customer, string user,string customertype,
-            string region, string location, string hublocation, string cdpncm, string issuetype, string sla)
+        public string getbulkclosedata()
+        {
+            var table = new HtmlTable();
+            string html = "";
+
+
+            var lstTicket = (from a in DataContext.Tickets
+                             where a.ticketdate == DateTime.Today
+                             select new
+                             {
+                                 a.BatchID,
+                                 a.TicketID,
+                                 a.crnno
+                             });
+
+            if (lstTicket != null)
+            {
+                HtmlTableRow row = new HtmlTableRow();
+                row.Cells.Add(new HtmlTableCell { InnerText = "Batch id" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Ticket id" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "CRN" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Mistake Done By" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Type of Error" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Pickup Date" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "HCIN No" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Amount" });
+                row.Cells.Add(new HtmlTableCell { InnerText = "Proble Details" });
+                table.Rows.Add(row);
+
+                foreach (var objreport in lstTicket)
+                {
+                    row = new HtmlTableRow();
+                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.BatchID });
+                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.TicketID });
+                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.crnno });
+                    row.Cells.Add(new HtmlTableCell { InnerText = ""});
+                    row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    row.Cells.Add(new HtmlTableCell { InnerText = "" });
+                    table.Rows.Add(row);
+                }
+
+                using (var sw = new StringWriter())
+                {
+                    table.RenderControl(new HtmlTextWriter(sw));
+                    html = sw.ToString();
+                }
+            }
+            return html;
+        }
+
+        public string GetReportData(string fromdate,string todate,string customer, string user,string customertype,
+         string region, string location, string hublocation, string cdpncm, string issuetype, string sla)
         {
             DateTime dtfromdate = DateTime.Parse(fromdate);
             DateTime dttodate = DateTime.Parse(todate);
