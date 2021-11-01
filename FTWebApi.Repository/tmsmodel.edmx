@@ -11,6 +11,7 @@
           </Key>
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Bank" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="rcmbank" Type="varchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="Batch">
           <Key>
@@ -19,7 +20,7 @@
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="BatchID" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Date" Type="datetime" />
-          <Property Name="FromEmail" Type="varchar" MaxLength="50" />
+          <Property Name="FromEmail" Type="varchar" MaxLength="500" />
           <Property Name="EmailSubject" Type="varchar" MaxLength="500" />
           <Property Name="EmailBody" Type="nvarchar(max)" />
           <Property Name="CreatedBy" Type="varchar" MaxLength="50" />
@@ -29,6 +30,8 @@
           <Property Name="acceptstatus" Type="varchar" MaxLength="50" />
           <Property Name="oldbatchid" Type="varchar" MaxLength="50" />
           <Property Name="Emailcc" Type="varchar(max)" />
+          <Property Name="emailattachment" Type="varchar(max)" />
+          <Property Name="Emailto" Type="varchar(max)" />
         </EntityType>
         <EntityType Name="ErrorType">
           <Key>
@@ -100,9 +103,17 @@
           <Property Name="customertype" Type="varchar" MaxLength="50" />
           <Property Name="hierarchycode" Type="varchar" MaxLength="50" />
           <Property Name="filepath" Type="varchar(max)" />
-          <Property Name="filename" Type="varchar" MaxLength="50" />
+          <Property Name="filename" Type="varchar" MaxLength="200" />
           <Property Name="rejectremark" Type="varchar" MaxLength="500" />
           <Property Name="Company" Type="varchar" MaxLength="10" />
+          <Property Name="filepath1" Type="varchar(max)" />
+          <Property Name="filename1" Type="varchar" MaxLength="200" />
+          <Property Name="filepath2" Type="varchar(max)" />
+          <Property Name="filename2" Type="varchar" MaxLength="200" />
+          <Property Name="filepath3" Type="varchar(max)" />
+          <Property Name="filename3" Type="varchar" MaxLength="200" />
+          <Property Name="filepath4" Type="varchar(max)" />
+          <Property Name="filename4" Type="varchar" MaxLength="200" />
         </EntityType>
         <EntityType Name="TicketDetails">
           <Key>
@@ -176,24 +187,6 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="RCMQueryModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="Batch">
-          <Key>
-            <PropertyRef Name="BatchID" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="BatchID" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Date" Type="DateTime" Precision="3" />
-          <Property Name="FromEmail" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="EmailSubject" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
-          <Property Name="EmailBody" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
-          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
-          <Property Name="acceptstatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="oldbatchid" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
-          <Property Name="Emailcc" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-        </EntityType>
         <EntityType Name="ErrorType">
           <Key>
             <PropertyRef Name="ErrorType1" />
@@ -245,9 +238,17 @@
           <Property Name="customertype" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="hierarchycode" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
           <Property Name="filepath" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
-          <Property Name="filename" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="filename" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="rejectremark" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
           <Property Name="Company" Type="String" MaxLength="10" FixedLength="false" Unicode="false" />
+          <Property Name="filepath1" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="filename1" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="filepath2" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="filename2" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="filepath3" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="filename3" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
+          <Property Name="filepath4" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="filename4" Type="String" MaxLength="200" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="TicketDetail">
           <Key>
@@ -278,7 +279,6 @@
           <Property Name="bankbranchlocation" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityContainer Name="TMSEntitiesnew" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Batches" EntityType="Self.Batch" />
           <EntitySet Name="ErrorTypes" EntityType="Self.ErrorType" />
           <EntitySet Name="KeyGens" EntityType="Self.KeyGen" />
           <EntitySet Name="Tickets" EntityType="Self.Ticket" />
@@ -288,6 +288,7 @@
           <EntitySet Name="userbankmaps" EntityType="RCMQueryModel.userbankmap" />
           <EntitySet Name="usermasters" EntityType="RCMQueryModel.usermaster" />
           <EntitySet Name="LocationEmailHistories" EntityType="RCMQueryModel.LocationEmailHistory" />
+          <EntitySet Name="Batches" EntityType="RCMQueryModel.Batch" />
         </EntityContainer>
         <EntityType Name="BankMaster">
           <Key>
@@ -295,6 +296,7 @@
           </Key>
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Bank" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="rcmbank" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
         </EntityType>
         <EntityType Name="QueryTypeMaster">
           <Key>
@@ -343,31 +345,32 @@
           <Property Name="emailsentdate" Type="DateTime" Precision="3" />
           <Property Name="ccemailid" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
         </EntityType>
+        <EntityType Name="Batch">
+          <Key>
+            <PropertyRef Name="BatchID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="BatchID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Date" Type="DateTime" Precision="3" />
+          <Property Name="FromEmail" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="EmailSubject" Type="String" MaxLength="500" FixedLength="false" Unicode="false" />
+          <Property Name="EmailBody" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <Property Name="ModifiedBy" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="ModifiedDate" Type="DateTime" Precision="3" />
+          <Property Name="acceptstatus" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="oldbatchid" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="Emailcc" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="emailattachment" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="Emailto" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="RCMQueryModelStoreContainer" CdmEntityContainer="TMSEntitiesnew">
-          <EntitySetMapping Name="Batches">
-            <EntityTypeMapping TypeName="RCMQueryModel.Batch">
-              <MappingFragment StoreEntitySet="Batch">
-                <ScalarProperty Name="Emailcc" ColumnName="Emailcc" />
-                <ScalarProperty Name="oldbatchid" ColumnName="oldbatchid" />
-                <ScalarProperty Name="acceptstatus" ColumnName="acceptstatus" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-                <ScalarProperty Name="BatchID" ColumnName="BatchID" />
-                <ScalarProperty Name="Date" ColumnName="Date" />
-                <ScalarProperty Name="FromEmail" ColumnName="FromEmail" />
-                <ScalarProperty Name="EmailSubject" ColumnName="EmailSubject" />
-                <ScalarProperty Name="EmailBody" ColumnName="EmailBody" />
-                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
-                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
-                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
-                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="ErrorTypes">
             <EntityTypeMapping TypeName="RCMQueryModel.ErrorType">
               <MappingFragment StoreEntitySet="ErrorType">
@@ -390,6 +393,14 @@
           <EntitySetMapping Name="Tickets">
             <EntityTypeMapping TypeName="RCMQueryModel.Ticket">
               <MappingFragment StoreEntitySet="Ticket">
+                <ScalarProperty Name="filename4" ColumnName="filename4" />
+                <ScalarProperty Name="filepath4" ColumnName="filepath4" />
+                <ScalarProperty Name="filename3" ColumnName="filename3" />
+                <ScalarProperty Name="filepath3" ColumnName="filepath3" />
+                <ScalarProperty Name="filename2" ColumnName="filename2" />
+                <ScalarProperty Name="filepath2" ColumnName="filepath2" />
+                <ScalarProperty Name="filename1" ColumnName="filename1" />
+                <ScalarProperty Name="filepath1" ColumnName="filepath1" />
                 <ScalarProperty Name="Company" ColumnName="Company" />
                 <ScalarProperty Name="rejectremark" ColumnName="rejectremark" />
                 <ScalarProperty Name="filename" ColumnName="filename" />
@@ -458,6 +469,7 @@
           <EntitySetMapping Name="BankMasters">
             <EntityTypeMapping TypeName="RCMQueryModel.BankMaster">
               <MappingFragment StoreEntitySet="BankMaster">
+                <ScalarProperty Name="rcmbank" ColumnName="rcmbank" />
                 <ScalarProperty Name="Bank" ColumnName="Bank" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
@@ -510,6 +522,27 @@
                 <ScalarProperty Name="emailsubject" ColumnName="emailsubject" />
                 <ScalarProperty Name="toemailid" ColumnName="toemailid" />
                 <ScalarProperty Name="Ticketno" ColumnName="Ticketno" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Batches">
+            <EntityTypeMapping TypeName="RCMQueryModel.Batch">
+              <MappingFragment StoreEntitySet="Batch">
+                <ScalarProperty Name="Emailto" ColumnName="Emailto" />
+                <ScalarProperty Name="emailattachment" ColumnName="emailattachment" />
+                <ScalarProperty Name="Emailcc" ColumnName="Emailcc" />
+                <ScalarProperty Name="oldbatchid" ColumnName="oldbatchid" />
+                <ScalarProperty Name="acceptstatus" ColumnName="acceptstatus" />
+                <ScalarProperty Name="ModifiedDate" ColumnName="ModifiedDate" />
+                <ScalarProperty Name="ModifiedBy" ColumnName="ModifiedBy" />
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+                <ScalarProperty Name="EmailBody" ColumnName="EmailBody" />
+                <ScalarProperty Name="EmailSubject" ColumnName="EmailSubject" />
+                <ScalarProperty Name="FromEmail" ColumnName="FromEmail" />
+                <ScalarProperty Name="Date" ColumnName="Date" />
+                <ScalarProperty Name="BatchID" ColumnName="BatchID" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>

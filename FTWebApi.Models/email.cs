@@ -13,9 +13,10 @@ namespace FTWebApi.Models
         public string ccemailid { get; set; }
         public string emailsubject { get; set; }
         public string emailbody { get; set; }
+        public string emailattachment { get; set; }
         public string emailsubject1 { get; set; }
         public DateTime? sentdate { get; set; }
-
         public string filepath { get; set; }
+        public Boolean location { get; set; }
     }
 }

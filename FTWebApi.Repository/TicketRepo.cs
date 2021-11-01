@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using FTWebApi.Interface;
 using FTWebApi.Models;
-using FTWebApi.Interface;
-using System.Globalization;
-using System.Net.Mail;
-using System.Net;
-using System.Web.UI.HtmlControls;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Mail;
+using System.Text;
 using System.Web.UI;
-using System.Data.Entity.SqlServer;
-using System.Data.Entity;
+using System.Web.UI.HtmlControls;
 
 namespace FTWebApi.Repository
 {
@@ -20,7 +16,7 @@ namespace FTWebApi.Repository
     {
         TMSEntitiesnew DataContext = new TMSEntitiesnew();
         rcmentities rcmDataContext = new rcmentities();
-
+        
         public List<FTWebApi.Models.ticketcount> getadmindashboardcountnew(string userid, DateTime dtticketdate)
         {
 
@@ -30,7 +26,7 @@ namespace FTWebApi.Repository
             List<FTWebApi.Models.ticketcount> objticketcountlst = new List<FTWebApi.Models.ticketcount>();
 
             var ticketgroup = (from t in DataContext.Tickets
-                               where  t.assignedto != null
+                               where t.assignedto != null
                                group t by new
                                {
                                    t.customer,
@@ -60,24 +56,24 @@ namespace FTWebApi.Repository
                                && ts.customer == tgroup.Bankkey && !ts.querystatus.Contains("Close")
                                select ts.TicketID).Count();
                 duplicatecount = (from ts in DataContext.Tickets
-                                  where  ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Duplicate"
+                                  where ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Duplicate"
                                   && ts.customer == tgroup.Bankkey && !ts.querystatus.Contains("Close")
                                   select ts.TicketID).Count();
                 rejectcount = (from ts in DataContext.Tickets
-                               where  ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Reject"
+                               where ts.assignedto == tgroup.Userkey && ts.acceptstatus == "Reject"
                                && ts.customer == tgroup.Bankkey && !ts.querystatus.Contains("Close")
                                select ts.TicketID).Count();
                 opencount = (from ts in DataContext.Tickets
-                             where  ts.assignedto == tgroup.Userkey && ts.querystatus == "Open"
+                             where ts.assignedto == tgroup.Userkey && ts.querystatus == "Open"
                              && !ts.acceptstatus.Contains("Reject") && !ts.acceptstatus.Contains("Duplicate") && !ts.querystatus.Contains("Close")
                              && ts.customer == tgroup.Bankkey
                              select ts.TicketID).Count();
                 closecount = (from ts in DataContext.Tickets
-                              where  ts.assignedto == tgroup.Userkey && ts.querystatus == "Close"
+                              where ts.assignedto == tgroup.Userkey && ts.querystatus == "Close"
                               && ts.customer == tgroup.Bankkey
                               select ts.TicketID).Count();
                 totalcount = (from ts in DataContext.Tickets
-                              where  ts.assignedto == tgroup.Userkey
+                              where ts.assignedto == tgroup.Userkey
                               && !ts.acceptstatus.Contains("Reject") && !ts.acceptstatus.Contains("Duplicate") && !ts.querystatus.Contains("Close")
                               && ts.customer == tgroup.Bankkey
                               select ts.TicketID).Count();
@@ -97,7 +93,7 @@ namespace FTWebApi.Repository
             }
 
             return objticketcountlst;
-         
+
         }
 
         public List<FTWebApi.Models.ticketcount> getadmindashboardcount(string userid, DateTime dtticketdate, DateTime todate)
@@ -155,7 +151,7 @@ namespace FTWebApi.Repository
                               && ts.customer == tgroup.Bankkey
                               select ts.TicketID).Count();
                 totalcount = (from ts in DataContext.Tickets
-                              where ts.ticketdate >= dtticketdate && ts.ticketdate <= todate  && ts.assignedto == tgroup.Userkey
+                              where ts.ticketdate >= dtticketdate && ts.ticketdate <= todate && ts.assignedto == tgroup.Userkey
                               && ts.customer == tgroup.Bankkey
                               select ts.TicketID).Count();
 
@@ -179,7 +175,7 @@ namespace FTWebApi.Repository
         }
 
 
-        public List<FTWebApi.Models.ticketcount> getdashboardcount(string userid,DateTime dtticketdate, DateTime todate)
+        public List<FTWebApi.Models.ticketcount> getdashboardcount(string userid, DateTime dtticketdate, DateTime todate)
         {
 
             FTWebApi.Models.ticketcount objticketcount;
@@ -193,7 +189,7 @@ namespace FTWebApi.Repository
                                select new
                                {
                                    Key = customergroup.Key
-                                  // grouplist = customergroup.ToList()
+                                   // grouplist = customergroup.ToList()
                                });
 
 
@@ -208,32 +204,32 @@ namespace FTWebApi.Repository
                 totalcount = 0;
 
                 acceptcount = (from ts in DataContext.Tickets
-                                   where  ts.assignedto == userid && ts.acceptstatus == "Accept"
-                                   && !ts.acceptstatus.Contains("Reject") && ts.acceptstatus != "Duplicate" && !ts.querystatus.Contains("Close")
-                                   && ts.customer == tgroup.Key
-                                   select ts.TicketID).Count();
+                               where ts.assignedto == userid && ts.acceptstatus == "Accept"
+                               && !ts.acceptstatus.Contains("Reject") && ts.acceptstatus != "Duplicate" && !ts.querystatus.Contains("Close")
+                               && ts.customer == tgroup.Key
+                               select ts.TicketID).Count();
                 duplicatecount = (from ts in DataContext.Tickets
-                                   where  ts.assignedto == userid && ts.acceptstatus == "Duplicate"
-                                   && ts.customer == tgroup.Key
-                                   select ts.TicketID).Count();
-                rejectcount = (from ts in DataContext.Tickets
-                                      where  ts.assignedto == userid && ts.acceptstatus == "Reject"
-                                      && ts.customer == tgroup.Key
-                                      select ts.TicketID).Count();
-                opencount = (from ts in DataContext.Tickets
-                                   where  ts.assignedto == userid && ts.querystatus == "Open"
-                                   && !ts.acceptstatus.Contains("Reject") && ts.acceptstatus != "Duplicate" && !ts.querystatus.Contains("Close")
-                                   && ts.customer == tgroup.Key
-                                   select ts.TicketID).Count();
-                closecount = (from ts in DataContext.Tickets
-                                 where ts.assignedto == userid && ts.querystatus == "Close"
-                                 && ts.customer == tgroup.Key
-                                 select ts.TicketID).Count();
-                 totalcount = (from ts in DataContext.Tickets
-                                  where ts.assignedto == userid
-                                  && !ts.acceptstatus.Contains("Reject") && ts.acceptstatus != "Duplicate" && !ts.querystatus.Contains("Close")
+                                  where ts.assignedto == userid && ts.acceptstatus == "Duplicate"
                                   && ts.customer == tgroup.Key
                                   select ts.TicketID).Count();
+                rejectcount = (from ts in DataContext.Tickets
+                               where ts.assignedto == userid && ts.acceptstatus == "Reject"
+                               && ts.customer == tgroup.Key
+                               select ts.TicketID).Count();
+                opencount = (from ts in DataContext.Tickets
+                             where ts.assignedto == userid && ts.querystatus == "Open"
+                             && !ts.acceptstatus.Contains("Reject") && ts.acceptstatus != "Duplicate" && !ts.querystatus.Contains("Close")
+                             && ts.customer == tgroup.Key
+                             select ts.TicketID).Count();
+                closecount = (from ts in DataContext.Tickets
+                              where ts.assignedto == userid && ts.querystatus == "Close"
+                              && ts.customer == tgroup.Key
+                              select ts.TicketID).Count();
+                totalcount = (from ts in DataContext.Tickets
+                              where ts.assignedto == userid
+                              && !ts.acceptstatus.Contains("Reject") && ts.acceptstatus != "Duplicate" && !ts.querystatus.Contains("Close")
+                              && ts.customer == tgroup.Key
+                              select ts.TicketID).Count();
 
                 objticketcount.bank = tgroup.Key;
                 objticketcount.userid = userid;
@@ -243,14 +239,14 @@ namespace FTWebApi.Repository
                 objticketcount.opencount = opencount;
                 objticketcount.closecount = closecount;
                 objticketcount.totalcount = totalcount;
-                objticketcount.pendingcount = totalcount ;
+                objticketcount.pendingcount = totalcount;
                 objticketcountlst.Add(objticketcount);
 
-                }
+            }
 
             return objticketcountlst;
 
-            
+
         }
 
         public List<FTWebApi.Models.ticketcount> getdashboardcountold(string userid, DateTime dtticketdate)
@@ -328,11 +324,11 @@ namespace FTWebApi.Repository
             ddlisttracker ddl = new ddlisttracker();
 
             var customerlst = (from e in DataContext.BankMasters
-                                 select new customer
-                                 {
-                                     ID = e.ID,
-                                     Name = e.Bank
-                                 }).AsQueryable();
+                               select new customer
+                               {
+                                   ID = e.ID,
+                                   Name = e.Bank
+                               }).AsQueryable();
 
             var userlist = (from a in DataContext.usermasters
                             select new Userddl
@@ -463,7 +459,9 @@ namespace FTWebApi.Repository
             //join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
             //&area.regioncode == a.Regioncode & area.LocationCode == a.LocationCode & area.hublocationcode == a.HubLocationCode
 
-                    var crnno = (from a in rcmDataContext.ClientCustMasters
+            FTWebApi.Models.rcmdetail crnno;
+
+             crnno = (from a in rcmDataContext.ClientCustMasters
                          join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
                          join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
                          join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
@@ -471,12 +469,49 @@ namespace FTWebApi.Repository
                          join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
                          join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
                          join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
-                         where b.PickupCode == pickupcode & b.ClientCode == clientcode & c.CustomerName.StartsWith(customer.Substring(0,3)) & b.AccountId == clientcode
+                         where b.PickupCode == pickupcode & b.ClientCode == clientcode & c.CustomerName.StartsWith(customer.Substring(0, 3)) & b.AccountId == clientcode
                          & l.regioncode == r.regioncode & h.locationcode == l.locationcode
                          select new rcmdetail { crn = a.ClientCustCode, clientname = a.ClientCustName, region = r.regionname,
                              location = l.locationname, hublocation = h.hublocationname, area = area.LocationName
-                             , customertype = a.AccountType, cdpncm = j.DepositionType, hierarchycode = b.HierarchyCode,Company = a.CompanyCode
+                             , customertype = a.AccountType, cdpncm = j.DepositionType, hierarchycode = b.HierarchyCode, Company = a.CompanyCode
                          }).SingleOrDefault();
+
+            if (crnno == null)
+            {
+                var rcmbank = (from a in DataContext.BankMasters
+                               where a.Bank == customer
+                               select a.rcmbank).SingleOrDefault();
+
+                if (rcmbank!=null)
+                {
+                    crnno = (from a in rcmDataContext.ClientCustMasters
+                                 join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
+                                 join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
+                                 join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
+                                 join l in rcmDataContext.LocationMasts on a.LocationCode equals l.locationcode
+                                 join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
+                                 join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
+                                 join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
+                                 where b.PickupCode == pickupcode & b.ClientCode == clientcode & c.CustomerName.StartsWith(rcmbank.Substring(0, 3)) & b.AccountId == clientcode
+                                 & l.regioncode == r.regioncode & h.locationcode == l.locationcode
+                                 select new rcmdetail
+                                 {
+                                     crn = a.ClientCustCode,
+                                     clientname = a.ClientCustName,
+                                     region = r.regionname,
+                                     location = l.locationname,
+                                     hublocation = h.hublocationname,
+                                     area = area.LocationName,                                     
+                                     customertype = a.AccountType,
+                                     cdpncm = j.DepositionType,
+                                     hierarchycode = b.HierarchyCode,
+                                     Company = a.CompanyCode
+                                 }).SingleOrDefault();
+
+                }
+
+
+            }
 
                 return crnno;
 
@@ -495,11 +530,13 @@ namespace FTWebApi.Repository
                          join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
                          join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
                          join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
-                         where b.ClientCode == clientcode & a.ClientCustCode == crnnos & b.AccountId == clientcode
+                         //where b.ClientCode == clientcode & a.ClientCustCode == crnnos & b.AccountId == clientcode
+                         where  a.ClientCustCode == crnnos 
                          & l.regioncode == r.regioncode & h.locationcode == l.locationcode
                          select new rcmdetail
                          {
                              pickupcode = b.PickupCode,
+                             clientcode = b.ClientCode,
                              clientname = a.ClientCustName,
                              region = r.regionname,
                              location = l.locationname,
@@ -509,16 +546,102 @@ namespace FTWebApi.Repository
                              cdpncm = j.DepositionType,
                              hierarchycode = b.HierarchyCode,
                              Company = a.CompanyCode
-                         }).SingleOrDefault();
+                         }).FirstOrDefault();
 
             return crnno;
 
         }
-        public void AddExcelCloseData(List<FTWebApi.Models.Ticket> lstTicket, List<FTWebApi.Models.ticketdetails> lsttd)
+
+
+        public FTWebApi.Models.rcmdetail getrcmdatamanual(string crnnos, string clientcode)
+        {
+            //join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
+            //&area.regioncode == a.Regioncode & area.LocationCode == a.LocationCode & area.hublocationcode == a.HubLocationCode
+
+                var crnno = (from a in rcmDataContext.ClientCustMasters
+                         join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
+                         join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
+                         join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
+                         join l in rcmDataContext.LocationMasts on a.LocationCode equals l.locationcode
+                         join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
+                         join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
+                         join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
+                         where a.ClientCustCode == crnnos 
+                         //where b.ClientCode == clientcode & a.ClientCustCode == crnnos & b.AccountId == clientcode
+                         & l.regioncode == r.regioncode & h.locationcode == l.locationcode
+                         select new rcmdetail
+                         {
+                             pickupcode = b.PickupCode,
+                             clientcode = b.ClientCode,
+                             clientname = a.ClientCustName,
+                             region = r.regionname,
+                             location = l.locationname,
+                             hublocation = h.hublocationname,
+                             area = area.LocationName,
+                             customertype = a.AccountType,
+                             cdpncm = j.DepositionType,
+                             hierarchycode = b.HierarchyCode,
+                             Company = a.CompanyCode,
+                             customer = c.CustomerName
+                         }).FirstOrDefault();
+
+                
+            var bank = (from a in DataContext.BankMasters
+                        where a.Bank.StartsWith(crnno.customer.Substring(0, 3))
+                        select a.Bank).FirstOrDefault();
+
+            if (bank != null)
+            {
+                crnno.customer = bank;
+            }
+            else
+            {
+                crnno.customer = "";
+            }
+
+            return crnno;
+
+        }
+
+        public String AddExcelCloseData(List<FTWebApi.Models.Ticket> lstTicket, List<FTWebApi.Models.ticketdetails> lsttd)
         {
             foreach (var objticket in lstTicket)
             {
-                
+                Ticket tc = (from c in DataContext.Tickets
+                             where c.TicketID == objticket.ticketno
+                             select c).FirstOrDefault();
+
+                if (tc == null)
+                {
+                    return "Ticket";
+                }
+
+                if (tc.BatchID != objticket.batchno)
+                {
+                    return "Batch";
+                }
+
+
+                if (tc.querystatus == "Close")
+                {
+                    return "Close";
+                }
+
+                if (tc.acceptstatus == "MAccept")
+                {
+                    return "Accept";
+                }
+
+                if (tc.crnno != objticket.crnno)
+                {
+                    return "CRN";
+                }
+            }
+
+
+            foreach (var objticket in lstTicket)
+            {
+
                 Ticket tc = (from c in DataContext.Tickets
                              where c.TicketID == objticket.ticketno
                              select c).FirstOrDefault();
@@ -535,12 +658,13 @@ namespace FTWebApi.Repository
                 tc.ModifiedDate = DateTime.Now;
 
                 TicketDetail td = (from c in DataContext.TicketDetails
-                                    where c.TicketID == objticket.ticketno
-                                    select c).FirstOrDefault();
+                                   where c.TicketID == objticket.ticketno
+                                   select c).FirstOrDefault();
+                
+                FTWebApi.Models.ticketdetails tdexcel = lsttd.Where(a => a.ticketno == objticket.ticketno).FirstOrDefault();
 
                 if (td != null)
                 {
-                    FTWebApi.Models.ticketdetails tdexcel = lsttd.Where(a => a.ticketno == objticket.ticketno).FirstOrDefault();
                     td.TicketID = objticket.ticketno;
                     td.pickupcode = tc.pickupcode;
                     td.clientcode = tc.clientcode;
@@ -550,10 +674,26 @@ namespace FTWebApi.Repository
                     td.actualamt = tdexcel.actualamt;
                     td.ModifiedDate = DateTime.Now;
                 }
-                DataContext.SaveChanges();
+                else
+                {
+                    td = new TicketDetail();
 
+                    td.TicketID = objticket.ticketno;
+                    td.pickupcode = tc.pickupcode;
+                    td.clientcode = tc.clientcode;
+                    td.crnno = tc.crnno;
+                    td.pickupdate = tdexcel.pickupdate;
+                    td.actualhcin = tdexcel.actualhcin;
+                    td.actualamt = tdexcel.actualamt;
+                    td.ModifiedDate = DateTime.Now;
+
+                    DataContext.TicketDetails.Add(td);
+                }
+                    
             }
+            DataContext.SaveChanges();
 
+            return "Success";
         }
 
         public void AddExcelData(List<FTWebApi.Models.Ticket> lstticket)
@@ -563,6 +703,8 @@ namespace FTWebApi.Repository
             string sbatchno = "";
             string ssubject = "";
             string semailfrom = "";
+            string semailcc = "";
+            Boolean batchexist = false;
             sbatchno = getbatchno();
 
 
@@ -570,103 +712,250 @@ namespace FTWebApi.Repository
             {
                 ssubject = objticket.emailsubject;
                 semailfrom = objticket.emailfrom;
+                semailcc = objticket.emailcc;
+                Ticket tc = new Ticket();
 
-                var newticket = (from a in rcmDataContext.ClientCustMasters
-                                  join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
-                                  join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
-                                  join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
-                                  join l in rcmDataContext.LocationMasts on a.LocationCode equals l.locationcode
-                                  join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
-                                  join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
-                                  join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
-                                  where a.ClientCustCode == objticket.crnno
-                                  & l.regioncode == r.regioncode & h.locationcode == l.locationcode
-                                  select new
-                                  {
-                                      crnno = objticket.crnno,
-                                      tickettype = objticket.tickettype,
-                                      pickupcode = b.PickupCode,
-                                      clientcode = b.ClientCode,
-                                      client = a.ClientCustName,
-                                      region = r.regionname,
-                                      location = l.locationname,
-                                      hublocation = h.hublocationname,
-                                      area = area.LocationName,
-                                      customertype = a.AccountType,
-                                      cdpncm = j.DepositionType,
-                                      hierarchycode = b.HierarchyCode
+                if (objticket.crnno != null && objticket.crnno!="")
+                {
 
-                                  }).FirstOrDefault();
+                    var newticket = (from a in rcmDataContext.ClientCustMasters
+                                     join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
+                                     join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
+                                     join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
+                                     join l in rcmDataContext.LocationMasts on a.LocationCode equals l.locationcode
+                                     join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
+                                     join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
+                                     join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
+                                     where a.ClientCustCode == objticket.crnno
+                                     & l.regioncode == r.regioncode & h.locationcode == l.locationcode
+                                     select new
+                                     {
+                                         crnno = objticket.crnno,
+                                         tickettype = objticket.tickettype,
+                                         pickupcode = b.PickupCode,
+                                         clientcode = b.ClientCode,
+                                         client = a.ClientCustName,
+                                         region = r.regionname,
+                                         location = l.locationname,
+                                         hublocation = h.hublocationname,
+                                         area = area.LocationName,
+                                         customertype = a.AccountType,
+                                         cdpncm = j.DepositionType,
+                                         hierarchycode = b.HierarchyCode
 
-                    ticketno = genticketno();
-                    assigneduser = "";
-
-                    Ticket tc = new Ticket();
-
-                    tc.TicketID = ticketno;
-                    tc.querystatus = "Open";
-                    if (objticket.bank != null && objticket.bank != "")
+                                     }).FirstOrDefault();
+                    if (newticket != null)
                     {
-                        if (objticket.tickettype != "" && objticket.tickettype != null)
+                        tc.pickupcode = newticket.pickupcode;
+                        tc.clientcode = newticket.clientcode;
+                        tc.client = newticket.client;
+                        tc.crnno = newticket.crnno;
+                        tc.area = newticket.area;
+                        tc.cdpncm = newticket.cdpncm;
+                        tc.region = newticket.region;
+                        tc.location = newticket.location;
+                        tc.hublocation = newticket.hublocation;
+                        tc.customertype = newticket.customertype;
+                        tc.hierarchycode = newticket.hierarchycode;
+                    }
+                }
+                else if ((objticket.pickupcode != null && objticket.pickupcode != "") &&
+                      (objticket.clientcode != null && objticket.clientcode != "" ) &&
+                      (objticket.bank != null && objticket.bank != ""))
+                {
+
+                    var newticket = (from a in rcmDataContext.ClientCustMasters
+                                 join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
+                                 join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
+                                 join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
+                                 join l in rcmDataContext.LocationMasts on a.LocationCode equals l.locationcode
+                                 join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
+                                 join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
+                                 join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
+                                 where b.PickupCode == objticket.pickupcode & b.ClientCode == objticket.clientcode & 
+                                 c.CustomerName.StartsWith(objticket.bank.Substring(0, 3)) & b.AccountId == objticket.clientcode
+                                 & l.regioncode == r.regioncode & h.locationcode == l.locationcode
+                                 select new
+                                 {
+                                     crnno = objticket.crnno,
+                                     tickettype = objticket.tickettype,
+                                     pickupcode = b.PickupCode,
+                                     clientcode = b.ClientCode,
+                                     client = a.ClientCustName,
+                                     region = r.regionname,
+                                     location = l.locationname,
+                                     hublocation = h.hublocationname,
+                                     area = area.LocationName,
+                                     customertype = a.AccountType,
+                                     cdpncm = j.DepositionType,
+                                     hierarchycode = b.HierarchyCode
+
+                                 }).FirstOrDefault();
+
+                    if (newticket == null)
+                    {
+                        var rcmbank = (from a in DataContext.BankMasters
+                                       where a.Bank == objticket.bank
+                                       select a.rcmbank).SingleOrDefault();
+
+                        if (rcmbank != null)
                         {
-                            assigneduser = (from c in DataContext.usermasters
-                                            join m in DataContext.userbankmaps on c.Userid equals m.Userid
-                                            where m.Bank.Contains(objticket.bank) & m.QueryType == objticket.tickettype & m.UserPriority == "1"
-                                            select c.Userid).SingleOrDefault();
+                            newticket = (from a in rcmDataContext.ClientCustMasters
+                                         join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
+                                         join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
+                                         join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
+                                         join l in rcmDataContext.LocationMasts on a.LocationCode equals l.locationcode
+                                         join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
+                                         join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
+                                         join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
+                                         where b.PickupCode == objticket.pickupcode & b.ClientCode == objticket.clientcode &
+                                         c.CustomerName.StartsWith(rcmbank.Substring(0, 3)) & b.AccountId == objticket.clientcode
+                                         & l.regioncode == r.regioncode & h.locationcode == l.locationcode
+                                         select new
+                                         {
+                                             crnno = objticket.crnno,
+                                             tickettype = objticket.tickettype,
+                                             pickupcode = b.PickupCode,
+                                             clientcode = b.ClientCode,
+                                             client = a.ClientCustName,
+                                             region = r.regionname,
+                                             location = l.locationname,
+                                             hublocation = h.hublocationname,
+                                             area = area.LocationName,
+                                             customertype = a.AccountType,
+                                             cdpncm = j.DepositionType,
+                                             hierarchycode = b.HierarchyCode
+
+                                         }).FirstOrDefault();
                         }
-                        else
-                        {
-                            assigneduser = (from c in DataContext.usermasters
-                                            join m in DataContext.userbankmaps on c.Userid equals m.Userid
-                                            where m.Bank.Contains(objticket.bank) & m.UserPriority == "1"
-                                            select c.Userid).FirstOrDefault();
-                        }
-                        tc.assignedto = assigneduser;
-                        tc.querystatus = "Assigned";
                     }
 
-                    tc.ticketdate = DateTime.Today;
-                    tc.BatchID = sbatchno;
-                    tc.tikcettime = TimeSpan.Parse(DateTime.Now.ToString("HH:mm:ss"));
-                    tc.tikcettype = objticket.tickettype;
-                    tc.customer = objticket.bank;
-                    tc.acceptstatus = "MAccept";
-                    tc.pickupcode = newticket.pickupcode;
-                    tc.clientcode = newticket.clientcode;
-                    tc.client = newticket.client;
-                    tc.crnno = newticket.crnno;
-                    tc.area = newticket.area;
-                    tc.cdpncm = newticket.cdpncm;
-                    tc.region = newticket.region;
-                    tc.location = newticket.location;
-                    tc.hublocation = newticket.hublocation;
-                    tc.customertype = newticket.customertype;
-                    tc.hierarchycode = newticket.hierarchycode;
-                    tc.CreatedBy = "";
-                    tc.CreatedDate = DateTime.Now;
+                    if (newticket != null)
+                    {
+                        tc.pickupcode = newticket.pickupcode;
+                        tc.clientcode = newticket.clientcode;
+                        tc.client = newticket.client;
+                        tc.crnno = newticket.crnno;
+                        tc.area = newticket.area;
+                        tc.cdpncm = newticket.cdpncm;
+                        tc.region = newticket.region;
+                        tc.location = newticket.location;
+                        tc.hublocation = newticket.hublocation;
+                        tc.customertype = newticket.customertype;
+                        tc.hierarchycode = newticket.hierarchycode;
+                    }
+                }
 
-                    DataContext.Tickets.Add(tc);
-
+                ticketno = genticketno();
+                assigneduser = "";
                 
+                tc.TicketID = ticketno;
+                tc.querystatus = "Open";
+                if (objticket.bank != null && objticket.bank != "")
+                {
+                    if (objticket.tickettype != "" && objticket.tickettype != null)
+                    {
+                        assigneduser = (from c in DataContext.usermasters
+                                        join m in DataContext.userbankmaps on c.Userid equals m.Userid
+                                        where m.Bank.Contains(objticket.bank) & m.QueryType == objticket.tickettype & m.UserPriority == "1"
+                                        select c.Userid).SingleOrDefault();
+                    }
+                    else
+                    {
+                        assigneduser = (from c in DataContext.usermasters
+                                        join m in DataContext.userbankmaps on c.Userid equals m.Userid
+                                        where m.Bank.Contains(objticket.bank) & m.UserPriority == "1"
+                                        select c.Userid).FirstOrDefault();
+                    }
+                    tc.assignedto = assigneduser;
+                    tc.querystatus = "Assigned";
+                }
+
+                tc.ticketdate = DateTime.Today;
+
+                if (objticket.batchno !="" && objticket.batchno != null)
+                {
+                    batchexist = true;
+                    tc.BatchID = objticket.batchno;
+                }
+                else
+                {
+                    tc.BatchID = sbatchno;
+                }
+                tc.tikcettime = TimeSpan.Parse(DateTime.Now.ToString("HH:mm:ss"));
+                tc.tikcettype = objticket.tickettype;
+                tc.customer = objticket.bank;
+                tc.acceptstatus = "MAccept";
+                
+                tc.CreatedBy = "";
+                tc.CreatedDate = DateTime.Now;
+
+                DataContext.Tickets.Add(tc);
+
+                if (objticket.region != "")
+                {
+                    TicketDetail td = new TicketDetail();
+
+                    td.TicketID = ticketno;
+                    td.pickupcode = objticket.pickupcode;
+                    td.clientcode = objticket.clientcode;
+                    td.crnno = objticket.crnno;
+                    td.pickupdate = objticket.ticketdate;
+                    td.actualdispis = objticket.location;
+                    td.soleid = objticket.hublocation;
+                    td.actualamt = Int32.Parse(objticket.region);
+                    td.ModifiedDate = DateTime.Now;
+
+                    DataContext.TicketDetails.Add(td);
+                }   
+
             }
 
-            Batch bt = new Batch();
-            bt.BatchID = sbatchno;
-            bt.Date = DateTime.Today;
-            bt.EmailBody = "upload";
-            bt.EmailSubject = ssubject;
-            bt.FromEmail = semailfrom;
-            bt.CreatedDate = DateTime.Now;
-            DataContext.Batches.Add(bt);
+            if (!batchexist)
+            {
+                Batch bt = new Batch();
+                bt.BatchID = sbatchno;
+                bt.Date = DateTime.Today;
+                bt.EmailBody = "upload";
+                bt.EmailSubject = ssubject;
+                bt.FromEmail = semailfrom;
+                bt.Emailcc = semailcc;
+                bt.CreatedDate = DateTime.Now;
+                DataContext.Batches.Add(bt);
+            }
 
             DataContext.SaveChanges();
 
         }
 
 
+        public bool DeleteTicket(String ticketno)
+        {
+            var lstsm = DataContext.Tickets.Where(p => p.TicketID == ticketno).FirstOrDefault();
+
+            if (lstsm != null)
+            {
+                DataContext.Tickets.Remove(lstsm);
+                var result = DataContext.SaveChanges();
+                if (result > 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
         public IQueryable<FTWebApi.Models.Ticket> GetAllTickets(string userid, string userrole)
         {
-            
+
             IQueryable<FTWebApi.Models.Ticket> lstTicket;
 
             try
@@ -762,29 +1051,29 @@ namespace FTWebApi.Repository
             return lstTicket;
         }
 
-        public IQueryable<FTWebApi.Models.Ticket> GetAllTicketsfordate(string datefilter,string todate, string userid, string userrole,string filter)
+        public IQueryable<FTWebApi.Models.Ticket> GetAllTicketsfordate(string datefilter, string todate, string userid, string userrole, string filter)
         {
             //join b in DataContext.Batches on a.BatchID equals b.BatchID
             //emailsubject = b.EmailSubject,s
             //emailfrom =b.FromEmail,
-            DateTime dt,dttodate;
+            DateTime dt, dttodate;
             string sfilter = "";
 
-            
+
             IQueryable<FTWebApi.Models.Ticket> lstTicket;
 
             sfilter = (filter == "undefined") ? "" : filter;
 
             try
             {
-                
+
                 if (userrole == "admin")
                 {
-                   
-                    if (filter=="close" || filter == "reject" || filter == "duplicate")
+
+                    if (filter == "close" || filter == "reject" || filter == "duplicate")
                     {
                         sfilter = filter;
-                    }    
+                    }
                     else
                     {
                         sfilter = "";
@@ -796,8 +1085,8 @@ namespace FTWebApi.Repository
                         lstTicket = (from a in DataContext.Tickets
                                      join b in DataContext.Batches on a.BatchID equals b.BatchID into ps
                                      from b in ps.DefaultIfEmpty()
-                                     //where a.ticketdate == dt
-                                     where  !a.acceptstatus.Contains("Reject") && a.acceptstatus != "Duplicate" && !a.querystatus.Contains("Close")
+                                         //where a.ticketdate == dt
+                                     where !a.acceptstatus.Contains("Reject") && a.acceptstatus != "Duplicate" && !a.querystatus.Contains("Close")
                                      orderby a.TicketID descending
                                      select new FTWebApi.Models.Ticket
                                      {
@@ -936,7 +1225,7 @@ namespace FTWebApi.Repository
                                  from b in ps.DefaultIfEmpty()
                                  where a.assignedto == userid
                                  //where a.ticketdate == dt && a.assignedto == userid
-                                 && !a.acceptstatus.Contains("Reject") && a.acceptstatus!="Duplicate" && !a.querystatus.Contains("Close")
+                                 && !a.acceptstatus.Contains("Reject") && a.acceptstatus != "Duplicate" && !a.querystatus.Contains("Close")
                                  orderby a.TicketID descending
                                  select new FTWebApi.Models.Ticket
                                  {
@@ -1036,7 +1325,9 @@ namespace FTWebApi.Repository
                                  emailsubject = b.EmailSubject,
                                  emailfrom = b.FromEmail,
                                  emailbody = b.EmailBody,
+                                 emailattachment = b.emailattachment,
                                  emailcc = b.Emailcc,
+                                 emailto = b.Emailto,
                                  acceptstatus = a.acceptstatus,
                                  bank = a.customer,
                                  pickupcode = a.pickupcode,
@@ -1056,6 +1347,10 @@ namespace FTWebApi.Repository
                                  status = a.querystatus,
                                  filepath = a.filepath,
                                  filename = a.filename,
+                                 filepath1 = a.filepath1,
+                                 filename1 = a.filename1,
+                                 filepath2 = a.filepath2,
+                                 filename2 = a.filename2,
                                  createduser = a.CreatedBy,
                                  company = a.Company,
                                  //createddate = (DateTime)a.CreatedDate,
@@ -1068,20 +1363,95 @@ namespace FTWebApi.Repository
             return lstTicket;
         }
 
-        public void updateuploadfilepath(string ticketno, string filePath,string FileName)
+        public void updateuploadfilepath(string ticketno, string filePath, string FileName)
         {
 
-             Ticket tc = (from c in DataContext.Tickets
-                          where c.TicketID == ticketno
-                          select c).FirstOrDefault();
+            Ticket tc = (from c in DataContext.Tickets
+                         where c.TicketID == ticketno
+                         select c).FirstOrDefault();
 
-             tc.filepath = filePath;
-             tc.filename = FileName;
+            tc.filepath = filePath;
+            tc.filename = FileName;
 
-             DataContext.SaveChanges();
+            DataContext.SaveChanges();
 
         }
-        public void UpdateTicketAccept(FTWebApi.Models.Ticket[] objlst)
+
+        public void updateuploadfilepath1(string ticketno, string filePath, string FileName)
+        {
+
+            Ticket tc = (from c in DataContext.Tickets
+                         where c.TicketID == ticketno
+                         select c).FirstOrDefault();
+
+            tc.filepath1 = filePath;
+            tc.filename1 = FileName;
+
+            DataContext.SaveChanges();
+
+        }
+
+        public void updateuploadfilepath2(string ticketno, string filePath, string FileName)
+        {
+
+            Ticket tc = (from c in DataContext.Tickets
+                         where c.TicketID == ticketno
+                         select c).FirstOrDefault();
+
+            tc.filepath2 = filePath;
+            tc.filename2 = FileName;
+
+            DataContext.SaveChanges();
+
+        }
+
+        public void UpdateTicketStatus(string ticketno)
+        {
+            Ticket tc = (from c in DataContext.Tickets
+                         where c.TicketID == ticketno
+                         select c).FirstOrDefault();
+
+            tc.querystatus = "Assigned";
+            tc.resolveddate = null;
+
+            DataContext.SaveChanges();
+
+        }
+
+        public void UpdateTicketStatusClose(string ticketno)
+        {
+            Ticket tc = (from c in DataContext.Tickets
+                         where c.TicketID == ticketno
+                         select c).FirstOrDefault();
+
+            tc.querystatus = "Close";
+            tc.resolveddate = DateTime.Now;
+
+            DataContext.SaveChanges();
+
+        }
+
+
+        public void DeleteTicketAll(FTWebApi.Models.Ticket[] objlst)
+        {
+            foreach (FTWebApi.Models.Ticket tmptilist in objlst)
+            {
+                Ticket tc = (from c in DataContext.Tickets
+                             where c.TicketID == tmptilist.ticketno
+                             select c).FirstOrDefault();
+                if (tc!=null)
+                {
+                    DataContext.Tickets.Remove(tc);
+                }
+                
+            }
+
+            DataContext.SaveChanges();
+
+        }
+
+
+            public void UpdateTicketAccept(FTWebApi.Models.Ticket[] objlst)
         {
             string batchno = "";
             try
@@ -1114,6 +1484,7 @@ namespace FTWebApi.Repository
 
                             tc.acceptstatus = tmptilist.acceptstatus;
                             tc.rejectremark = tmptilist.rejectremark;
+                            tc.assignedto = tmptilist.assignedto;
                         }
                     }
                     batchno = tmptilist.batchno;
@@ -1133,10 +1504,11 @@ namespace FTWebApi.Repository
                                                  where a.BatchID == tmptilist.batchno & a.acceptstatus == "Accept"
                                                  select a.TicketID).Count();
 
+                        /*
                         var ticketrejectcount = (from a in DataContext.Tickets
                                                  where a.BatchID == tmptilist.batchno & a.acceptstatus == "Reject"
                                                  select a.TicketID).Count();
-
+                        */
                         var ticketduplicatecount = (from a in DataContext.Tickets
                                                     where a.BatchID == tmptilist.batchno & a.acceptstatus == "Duplicate"
                                                     select a.TicketID).Count();
@@ -1150,6 +1522,7 @@ namespace FTWebApi.Repository
                             }
                         }
 
+                        /*
                         if (ticketcount == ticketrejectcount)
                         {
                             if (tmptilist.acceptstatus == "Reject")
@@ -1158,7 +1531,7 @@ namespace FTWebApi.Repository
                                 sendemailaccept(vbatch, "reject", tmptilist.rejectremark);
                             }
                         }
-
+                        */
                         if (ticketcount == ticketduplicatecount)
                         {
                             if (tmptilist.acceptstatus == "Duplicate")
@@ -1181,35 +1554,46 @@ namespace FTWebApi.Repository
         }
 
 
-        private void sendemailaccept(FTWebApi.Repository.Batch vbatch,string status,string rejectremark)
+        private void sendemailaccept(FTWebApi.Repository.Batch vbatch, string status, string rejectremark)
         {
             MailMessage message = new MailMessage();
             SmtpClient smtp = new SmtpClient();
             string msgsubject = "";
             string msgbody = "";
 
-            if (vbatch.FromEmail=="")
+            if (vbatch.FromEmail == "")
             {
                 return;
             }
 
-            message.From = new MailAddress("rcmuatquery@cms.com");
+            //message.From = new MailAddress("rcmuatquery@cms.com");
+            message.From = new MailAddress("rcm.opsquery@cms.com");
             message.To.Add(new MailAddress(vbatch.FromEmail));
 
-            if (status=="accept")
+            if (vbatch.Emailcc != null && vbatch.Emailcc != "")
+            {
+                string[] CCId = vbatch.Emailcc.Split(',');
+
+                foreach (string CCEmail in CCId)
+                {
+                    message.CC.Add(new MailAddress(CCEmail));
+                }
+            }
+
+            if (status == "accept")
             {
                 msgsubject = vbatch.BatchID + " " + vbatch.EmailSubject;
 
-                msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td>Thank you for writing to CMS Customer Service team!</td></tr><tr><td>Your query has been received vide batch no " + vbatch.BatchID +
-                         " and will revert asap.</td></tr><tr><td>Please note the interaction number for future reference.</td></tr><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
+                msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td></tr></td><tr><td>Thank you for writing to CMS Customer Service team!</td></tr><tr><td></tr></td><tr><td>Your query has been received vide batch no " + vbatch.BatchID +
+                         " and will revert asap.</td></tr><tr><td></tr></td><tr><td>Please note the interaction number for future reference.</td></tr><tr><td></tr></td><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td></tr></td><tr><td>Regards,</td></tr><tr><td></tr></td><tr><td>CMS Customer Service Team</td></tr></table>";
 
             }
             else if (status == "duplicate")
             {
-                msgsubject = "Duplicate "+ vbatch.EmailSubject;
+                msgsubject = "Duplicate " + vbatch.EmailSubject;
 
-                msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td>Thank you for writing to CMS Customer Service team!</td></tr><tr><td>Please note this is considered Duplicate request as team already working on same query against batch no" + vbatch.oldbatchid +
-                         "</td></tr><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
+                msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td></tr></td><tr><td>Thank you for writing to CMS Customer Service team!</td></tr><tr><td></tr></td><tr><td>Please note this is considered Duplicate request as team already working on same query against batch no" + vbatch.oldbatchid +
+                         "</td></tr><tr><td></tr></td><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td></tr></td><tr><td>Regards,</td></tr><tr><td></tr></td><tr><td>CMS Customer Service Team</td></tr></table>";
 
             }
             else if (status == "reject")
@@ -1217,7 +1601,7 @@ namespace FTWebApi.Repository
                 msgsubject = "Rejected " + vbatch.BatchID + " " + vbatch.EmailSubject;
 
                 msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td>Thank you for writing to CMS Customer Service team!</td></tr><tr><td>Your query has been received vide batch no " + vbatch.BatchID +
-                            " and will revert asap. Please note your query has been rejected due to below concerns.</td></tr><tr><td>"+ rejectremark + "</tr></td><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
+                            " and will revert asap. Please note your query has been rejected due to below concerns.</td></tr><tr><td>" + rejectremark + "</tr></td><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
 
             }
 
@@ -1228,9 +1612,10 @@ namespace FTWebApi.Repository
             smtp.Port = 587;
             //smtp.Host = "outlook.office365.com"; //for gmail host  
             smtp.Host = "sampark.cms.com";
-            smtp.EnableSsl = true;
+            smtp.EnableSsl = false;
             smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            //smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            smtp.Credentials = new NetworkCredential("rcm.opsquery@cms.com", "Rcm@opq2021");
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
             smtp.Send(message);
         }
@@ -1242,16 +1627,16 @@ namespace FTWebApi.Repository
             try
             {
                 Ticket tc = (from c in DataContext.Tickets
-                                          where c.TicketID == objticket.ticketno
-                                          select c).FirstOrDefault();
+                             where c.TicketID == objticket.ticketno
+                             select c).FirstOrDefault();
 
                 if (objticket.bank != null && objticket.bank != "")
                 {
                     if (objticket.assignedto == "" || objticket.assignedto == null)
                     {
                         assigneduser = (from c in DataContext.usermasters
-                                        join m in DataContext.userbankmaps on c.Userid equals m.Userid 
-                                        where  m.Bank.Contains(objticket.bank) & m.QueryType == objticket.tickettype & m.UserPriority == "1" 
+                                        join m in DataContext.userbankmaps on c.Userid equals m.Userid
+                                        where m.Bank.Contains(objticket.bank) & m.QueryType == objticket.tickettype & m.UserPriority == "1"
                                         select c.Userid).SingleOrDefault();
                         tc.assignedto = assigneduser;
                         tc.querystatus = "Assigned";
@@ -1259,7 +1644,7 @@ namespace FTWebApi.Repository
                     else
                     {
                         tc.assignedto = objticket.assignedto;
-                    }    
+                    }
                 }
 
                 tc.tikcettype = objticket.tickettype;
@@ -1290,8 +1675,8 @@ namespace FTWebApi.Repository
                     tc.resolveddate = DateTime.Now;
                 }
 
-                    //tc.ModifiedBy = objticket.modifieduser;
-                tc.ModifiedDate = DateTime.Now; 
+                //tc.ModifiedBy = objticket.modifieduser;
+                tc.ModifiedDate = DateTime.Now;
 
                 DataContext.SaveChanges();
             }
@@ -1303,10 +1688,10 @@ namespace FTWebApi.Repository
 
         public string ProcessTat(string datefilter)
         {
-            
+
             DateTime dt = DateTime.Parse(datefilter);
             TimeSpan? diff;
-            double hours=0;
+            double hours = 0;
             string html;
             DateTime dtprocess = DateTime.Today.AddDays(-3);
             DateTime tdate;
@@ -1319,7 +1704,7 @@ namespace FTWebApi.Repository
 
             var lstTicket = (from a in DataContext.Tickets
                              join b in DataContext.Batches on a.BatchID equals b.BatchID
-                             where a.ticketdate >= dtprocess && a.ticketdate <= DateTime.Today && a.resolveddate == null  
+                             where a.ticketdate >= dtprocess && a.ticketdate <= DateTime.Today && a.resolveddate == null
                              select new
                              {
                                  ticketno = a.TicketID,
@@ -1332,11 +1717,11 @@ namespace FTWebApi.Repository
                                  ticketstatus = a.querystatus,
                                  tickettype = a.tikcettype,
                                  createddate = a.CreatedDate,
-                                 assignedto  = a.assignedto, 
+                                 assignedto = a.assignedto,
                                  resolveddate = a.resolveddate
                              }).AsQueryable();
 
-            foreach ( var ticket in lstTicket)
+            foreach (var ticket in lstTicket)
             {
 
                 if (ticket.createddate.HasValue)
@@ -1351,7 +1736,7 @@ namespace FTWebApi.Repository
                         diff = (DateTime.Now - ticket.createddate);
                         hours = diff.Value.TotalHours;
                     }
-                    else if (ticket.createddate.Value.Date != DateTime.Today )
+                    else if (ticket.createddate.Value.Date != DateTime.Today)
                     {
                         diff = (DateTime.Now - ticket.createddate);
                         hours = diff.Value.TotalHours - 16;
@@ -1393,7 +1778,7 @@ namespace FTWebApi.Repository
 
                         objticketlist.Add(objticket);
                     }
-                }        
+                }
 
             }
 
@@ -1454,7 +1839,7 @@ namespace FTWebApi.Repository
                 row.Cells[8].Attributes.Add("style", "border-bottom: black thin solid");
                 table.Rows.Add(row);
             }
-        
+
 
             using (var sw = new StringWriter())
             {
@@ -1471,7 +1856,7 @@ namespace FTWebApi.Repository
 
 
             var lstTicket = (from a in DataContext.Tickets
-                             where a.ticketdate == DateTime.Today
+                             where !a.acceptstatus.Contains("Reject") && a.acceptstatus != "Duplicate" && !a.querystatus.Contains("Close") && a.acceptstatus == "Accept"
                              select new
                              {
                                  a.BatchID,
@@ -1499,7 +1884,7 @@ namespace FTWebApi.Repository
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.BatchID });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.TicketID });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.crnno });
-                    row.Cells.Add(new HtmlTableCell { InnerText = ""});
+                    row.Cells.Add(new HtmlTableCell { InnerText = "" });
                     row.Cells.Add(new HtmlTableCell { InnerText = "" });
                     row.Cells.Add(new HtmlTableCell { InnerText = "" });
                     row.Cells.Add(new HtmlTableCell { InnerText = "" });
@@ -1517,7 +1902,7 @@ namespace FTWebApi.Repository
             return html;
         }
 
-        public string GetReportData(string fromdate,string todate,string customer, string user,string customertype,
+        public string GetReportData(string fromdate, string todate, string customer, string user, string customertype,
          string region, string location, string hublocation, string cdpncm, string issuetype, string sla)
         {
             DateTime dtfromdate = DateTime.Parse(fromdate);
@@ -1526,8 +1911,7 @@ namespace FTWebApi.Repository
             string scustomer;
             string suser;
             string scustomertype;
-            string sregion,slocation, shublocation, scdpncm, sissuetype, ssla;
-
+            string sregion, slocation, shublocation, scdpncm, sissuetype, ssla;
 
             scustomer = (customer == "undefined") ? null : customer;
             suser = (user == "undefined") ? null : user;
@@ -1536,14 +1920,15 @@ namespace FTWebApi.Repository
             slocation = (location == "undefined") ? null : location;
             shublocation = (hublocation == "undefined") ? null : hublocation;
             scdpncm = (cdpncm == "undefined") ? null : cdpncm;
-            sissuetype = (issuetype == "undefined") ? null : issuetype; 
+            sissuetype = (issuetype == "undefined") ? null : issuetype;
             ssla = (sla == "undefined") ? null : sla;
 
-
-            var lstTicket = (from a in DataContext.TicketDetails
-                             join b in DataContext.Tickets on a.TicketID equals b.TicketID
+            var lstTicket = (from b in DataContext.Tickets
+                             join a in DataContext.TicketDetails on b.TicketID equals a.TicketID into ps
+                             from a in ps.DefaultIfEmpty()
                              join c in DataContext.Batches on b.BatchID equals c.BatchID
-                             join d in DataContext.ErrorTypes on b.errortype equals d.ID.ToString()
+                             join d in DataContext.ErrorTypes on b.errortype equals d.ID.ToString() into es
+                             from d in es.DefaultIfEmpty()
                              where b.ticketdate >= dtfromdate && b.ticketdate <= dttodate && b.customer == (scustomer ?? b.customer)
                              && b.assignedto == (suser ?? b.assignedto) && b.customertype == (scustomertype ?? b.customertype)
                              && b.region == (sregion ?? b.region) && b.location == (slocation ?? b.location) && b.hublocation == (shublocation ?? b.hublocation)
@@ -1598,13 +1983,13 @@ namespace FTWebApi.Repository
 
             var table = new HtmlTable();
             var mailMessage = new StringBuilder();
-            string html="";
+            string html = "";
             Int32 count = 0;
 
             if (lstTicket != null)
             {
                 HtmlTableRow row = new HtmlTableRow();
-                row.Cells.Add(new HtmlTableCell { InnerText = "SR"});
+                row.Cells.Add(new HtmlTableCell { InnerText = "SR" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Assigned to" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "CRA - CMS/SIPL" });
                 row.Cells.Add(new HtmlTableCell { InnerText = "Batch id" });
@@ -1660,8 +2045,8 @@ namespace FTWebApi.Repository
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.batchid });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.ticketno });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.ticketdate.ToShortDateString() });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.tickettime.ToString() });
-                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.ticketstatus});
+                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.tickettime.ToString(@"hh\:mm") });
+                    row.Cells.Add(new HtmlTableCell { InnerText = objreport.ticketstatus });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.rejectremark });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.resolveddate.ToString() });
 
@@ -1676,13 +2061,13 @@ namespace FTWebApi.Repository
                     else
                     {
                         var diff = (objreport.resolveddate - objreport.createddate);
-                        var hours = Math.Round(diff.Value.TotalHours,2);
+                        var hours = Math.Round(diff.Value.TotalHours, 2);
                         var days = Math.Round(hours / 24, 0);
                         row.Cells.Add(new HtmlTableCell { InnerText = days.ToString() });
 
                         if (objreport.ticketype == "PICKUP")
                         {
-                            if (hours <=2)
+                            if (hours <= 2)
                             {
                                 row.Cells.Add(new HtmlTableCell { InnerText = "Within TAT" });
                             }
@@ -1701,10 +2086,10 @@ namespace FTWebApi.Repository
                             {
                                 row.Cells.Add(new HtmlTableCell { InnerText = "After TAT" });
                             }
-                        }            
+                        }
 
                     }
-                    
+
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.emailfrom });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.emailsubject });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.querytype });
@@ -1728,8 +2113,8 @@ namespace FTWebApi.Repository
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.clientname });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.area });
                     row.Cells.Add(new HtmlTableCell { InnerText = objreport.cdpncm });
-                    
-                    if (objreport.wrongclientcode=="NA")
+
+                    if (objreport.wrongclientcode == "NA")
                     {
                         row.Cells.Add(new HtmlTableCell { InnerText = "" });
                     }
@@ -1840,7 +2225,7 @@ namespace FTWebApi.Repository
                 return html;
             }
             return html;
-        }   
+        }
 
         public string getticketclosecount(string batchno)
         {
@@ -1855,9 +2240,9 @@ namespace FTWebApi.Repository
                                     select a.TicketID).Count();
 
 
-            if (ticketcount == ticketclosecount+1 )
+            if (ticketcount == ticketclosecount + 1)
             {
-                sresponse="allclose";
+                sresponse = "allclose";
             }
 
             return sresponse;
@@ -1868,10 +2253,8 @@ namespace FTWebApi.Repository
             string sresponse = "";
 
             var modifieddate = (from a in DataContext.TicketDetails
-                               where a.TicketID == ticketno
-                               select a.ModifiedDate).SingleOrDefault();
-
-
+                                where a.TicketID == ticketno
+                                select a.ModifiedDate).FirstOrDefault();
 
             if (modifieddate is null)
             {
@@ -1884,6 +2267,24 @@ namespace FTWebApi.Repository
 
             return sresponse;
         }
+
+
+        public List<FTWebApi.Models.Ticket> getticketsforbatch(string batchno)
+        {
+             var tlist = (from a in DataContext.Tickets
+                            where a.BatchID == batchno
+                            select new FTWebApi.Models.Ticket 
+                             { ticketno = a.TicketID,
+                               filename = a.filename,
+                               filepath = a.filepath,
+                               filename1 = a.filename1,
+                               filepath1 = a.filepath1,
+                               filename2 = a.filename2,
+                               filepath2 = a.filepath2
+                            }).ToList() ;
+            return tlist;
+        }
+
 
         public string GenerateHtmlResponse(FTWebApi.Models.Ticket objticket)
         {
@@ -2170,6 +2571,8 @@ namespace FTWebApi.Repository
                 bt.EmailSubject = objbatch.emailsubject;
                 bt.FromEmail = objbatch.fromemail;
                 bt.Emailcc = objbatch.emailcc;
+                bt.Emailto = objbatch.emailto;
+                bt.emailattachment = objbatch.emailattachment;
 
                 var count = (from b in DataContext.Batches
                              where b.Date.Value.Year == objbatch.batchdate.Year
@@ -2215,22 +2618,25 @@ namespace FTWebApi.Repository
 
         public void InsertTicketDetails(FTWebApi.Models.ticketdetails[] objticketdetails)
         {
-            TicketDetail td = new TicketDetail();
+            TicketDetail td;
 
-            foreach (FTWebApi.Models.ticketdetails objtmp in objticketdetails)
-            {
-                TicketDetail lstom = (from om in DataContext.TicketDetails
-                             where om.TicketID == objtmp.ticketno & om.ID == objtmp.id
-                             select om).SingleOrDefault();
+            string ticketno = (from a in objticketdetails
+                           select a.ticketno).FirstOrDefault();
+
+            var lstom = (from om in DataContext.TicketDetails
+                         where om.TicketID == ticketno
+                         select om).AsQueryable();
+
                 if (lstom != null)
                 {
-                    DataContext.TicketDetails.Remove(lstom);
+                    DataContext.TicketDetails.RemoveRange(lstom);
                     DataContext.SaveChanges();
                 }
-            }
+                
 
             foreach (FTWebApi.Models.ticketdetails objtmp in objticketdetails)
             {
+                td = new TicketDetail();
                 td.TicketID = objtmp.ticketno;
                 td.pickupdate = objtmp.pickupdate;
                 td.pickupcode = objtmp.pickupcode;
@@ -2252,9 +2658,9 @@ namespace FTWebApi.Repository
                 td.ModifiedDate = DateTime.Now;
 
                 DataContext.TicketDetails.Add(td);
-
-                DataContext.SaveChanges();
-            }    
+                
+            }
+            DataContext.SaveChanges();
         }
 
         public void InsertTicket(FTWebApi.Models.Ticket objticket)
@@ -2497,8 +2903,74 @@ namespace FTWebApi.Repository
                                      cdpncm = j.DepositionType,
                                      hierarchycode = b.HierarchyCode,
                                      Company = a.CompanyCode
-                                 }).SingleOrDefault();
+                                 }).FirstOrDefault();
 
+                    if (crnno == null)
+                    {
+                        var rcmbank = (from a in DataContext.BankMasters
+                                       where a.Bank == tmptilist.bank
+                                       select a.rcmbank).SingleOrDefault();
+
+                        if (rcmbank != null)
+                        {
+
+                            crnno = (from a in rcmDataContext.ClientCustMasters
+                                         join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
+                                         join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
+                                         join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
+                                         join l in rcmDataContext.LocationMasts on a.LocationCode equals l.locationcode
+                                         join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
+                                         join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
+                                         join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
+                                         where b.PickupCode == tmptilist.pickupcode & b.ClientCode == tmptilist.clientcode & c.CustomerName.StartsWith(rcmbank.Substring(0, 3)) & b.AccountId == tmptilist.clientcode
+                                         & l.regioncode == r.regioncode & h.locationcode == l.locationcode
+                                         select new rcmdetail
+                                         {
+                                             crn = a.ClientCustCode,
+                                             clientname = a.ClientCustName,
+                                             region = r.regionname,
+                                             location = l.locationname,
+                                             hublocation = h.hublocationname,
+                                             area = area.LocationName,
+                                             customertype = a.AccountType,
+                                             cdpncm = j.DepositionType,
+                                             hierarchycode = b.HierarchyCode,
+                                             Company = a.CompanyCode
+                                         }).FirstOrDefault();
+                        }
+                    }
+
+                    if (crnno == null)
+                    {
+                        if (tmptilist.crnno != null && tmptilist.crnno != "")
+                        {
+                            crnno = (from a in rcmDataContext.ClientCustMasters
+                                     join b in rcmDataContext.ClientCustAccountMasters on a.ClientCustCode equals b.ClientCustCode
+                                     join c in rcmDataContext.CustomerMasters on a.CustomerCode equals c.CustomerCode
+                                     join r in rcmDataContext.RegionMasts on a.Regioncode equals r.regioncode
+                                     join l in rcmDataContext.LocationMasts on a.LocationCode equals l.locationcode
+                                     join area in rcmDataContext.LocationMasters on a.AreaCode equals area.LocationCode
+                                     join h in rcmDataContext.HublocationMasts on a.HubLocationCode equals h.hublocationcode
+                                     join j in rcmDataContext.ClientCustBankDetails on a.ClientCustCode equals j.ClientCustCode
+                                     //where b.ClientCode == clientcode & a.ClientCustCode == crnnos & b.AccountId == clientcode
+                                     where a.ClientCustCode == tmptilist.crnno
+                                     & l.regioncode == r.regioncode & h.locationcode == l.locationcode
+                                     select new rcmdetail
+                                     {
+                                         pickupcode = b.PickupCode,
+                                         clientcode = b.ClientCode,
+                                         clientname = a.ClientCustName,
+                                         region = r.regionname,
+                                         location = l.locationname,
+                                         hublocation = h.hublocationname,
+                                         area = area.LocationName,
+                                         customertype = a.AccountType,
+                                         cdpncm = j.DepositionType,
+                                         hierarchycode = b.HierarchyCode,
+                                         Company = a.CompanyCode
+                                     }).FirstOrDefault();
+                        }
+                    }
 
                     tc.ticketdate = tmptilist.ticketdate;
                     tc.BatchID = tmptilist.batchno;
@@ -2579,7 +3051,6 @@ namespace FTWebApi.Repository
                 }
 
                 DataContext.SaveChanges();
-
 
 
             }

@@ -47,5 +47,13 @@ namespace FTWebApi.Repository
         public string filename { get; set; }
         public string rejectremark { get; set; }
         public string Company { get; set; }
+        public string filepath1 { get; set; }
+        public string filename1 { get; set; }
+        public string filepath2 { get; set; }
+        public string filename2 { get; set; }
+        public string filepath3 { get; set; }
+        public string filename3 { get; set; }
+        public string filepath4 { get; set; }
+        public string filename4 { get; set; }
     }
 }

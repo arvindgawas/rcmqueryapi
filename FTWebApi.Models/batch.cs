@@ -14,6 +14,9 @@ namespace FTWebApi.Models
         public string emailsubject { get; set; }
         public string emailbody { get; set; }
         public string emailcc { get; set; }
+        public string emailto { get; set; }
+        public string emailattachment { get; set; }
+
     }
 }
 

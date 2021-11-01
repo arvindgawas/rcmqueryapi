@@ -14,6 +14,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using ExcelDataReader;
 using System.Data;
+using System.Net.Mime;
+using System.Text.RegularExpressions;
 
 namespace FTWebApi.Controllers
 {
@@ -21,7 +23,7 @@ namespace FTWebApi.Controllers
     {
         TicketRepo dalticketrepo = new TicketRepo();
 
-        [HttpPost]
+        [HttpPost] 
         public HttpResponseMessage UploadFile()
         {
             HttpResponseMessage result = null;
@@ -29,14 +31,16 @@ namespace FTWebApi.Controllers
             string ticketno = httpRequest.Form["ticketno"];
             string filePath="";
             string FileName= "";
+            
             if (httpRequest.Files.Count > 0)
             {
                 var docfiles = new List<string>();
                 foreach (string file in httpRequest.Files)
                 {
                     var postedFile = httpRequest.Files[file];
-                    filePath = HttpContext.Current.Server.MapPath("~/uploadfiles/" + postedFile.FileName);
-                    FileName = postedFile.FileName;
+                    FileName = System.IO.Path.GetFileNameWithoutExtension(postedFile.FileName) + ticketno + System.IO.Path.GetExtension(postedFile.FileName);
+                    filePath = HttpContext.Current.Server.MapPath("~/uploadfiles/" + FileName);
+                    //FileName = postedFile.FileName;
                     postedFile.SaveAs(filePath);
                     docfiles.Add(filePath);
                 }
@@ -51,6 +55,71 @@ namespace FTWebApi.Controllers
 
             return result;
         }
+
+        [HttpPost]
+        public HttpResponseMessage UploadFile1()
+        {
+            HttpResponseMessage result = null;
+            var httpRequest = HttpContext.Current.Request;
+            string ticketno = httpRequest.Form["ticketno"];
+            string filePath = "";
+            string FileName = "";
+            if (httpRequest.Files.Count > 0)
+            {
+                var docfiles = new List<string>();
+                foreach (string file in httpRequest.Files)
+                {
+                    var postedFile = httpRequest.Files[file];
+                    FileName = System.IO.Path.GetFileNameWithoutExtension(postedFile.FileName) + ticketno + System.IO.Path.GetExtension(postedFile.FileName);
+                    filePath = HttpContext.Current.Server.MapPath("~/uploadfiles/" + FileName);
+                    //FileName = postedFile.FileName;
+                    postedFile.SaveAs(filePath);
+                    docfiles.Add(filePath);
+                }
+                result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
+            }
+            else
+            {
+                result = Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            dalticketrepo.updateuploadfilepath1(ticketno, filePath, FileName);
+           
+            return result;
+        }
+
+        [HttpPost]
+        public HttpResponseMessage UploadFile2()
+        {
+            HttpResponseMessage result = null;
+            var httpRequest = HttpContext.Current.Request;
+            string ticketno = httpRequest.Form["ticketno"];
+            string filePath = "";
+            string FileName = "";
+            if (httpRequest.Files.Count > 0)
+            {
+                var docfiles = new List<string>();
+                foreach (string file in httpRequest.Files)
+                {
+                    var postedFile = httpRequest.Files[file];
+                    FileName = System.IO.Path.GetFileNameWithoutExtension(postedFile.FileName) + ticketno + System.IO.Path.GetExtension(postedFile.FileName);
+                    filePath = HttpContext.Current.Server.MapPath("~/uploadfiles/" + FileName);
+                    //FileName = postedFile.FileName;
+                    postedFile.SaveAs(filePath);
+                    docfiles.Add(filePath);
+                }
+                result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
+            }
+            else
+            {
+                result = Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            dalticketrepo.updateuploadfilepath2(ticketno, filePath, FileName);
+
+            return result;
+        }
+
 
         [HttpPost]
         public HttpResponseMessage UploadExcelFile()
@@ -103,8 +172,23 @@ namespace FTWebApi.Controllers
                                 objticket.crnno = Convert.ToString(dtStudentRecords.Rows[i][0]);
                                 objticket.tickettype = Convert.ToString(dtStudentRecords.Rows[i][1]);
                                 objticket.bank = Convert.ToString(dtStudentRecords.Rows[i][2]);
-                                objticket.emailfrom = Convert.ToString(dtStudentRecords.Rows[i][3]);
-                                objticket.emailsubject = Convert.ToString(dtStudentRecords.Rows[i][4]);
+                                objticket.batchno = Convert.ToString(dtStudentRecords.Rows[i][3]);
+                                if (dtStudentRecords.Rows[i][4]!=DBNull.Value)
+                                {
+                                    objticket.ticketdate = Convert.ToDateTime(dtStudentRecords.Rows[i][4]);
+                                }
+                                objticket.clientcode = Convert.ToString(dtStudentRecords.Rows[i][5]);
+                                objticket.pickupcode = Convert.ToString(dtStudentRecords.Rows[i][6]);
+                                //amount column
+                                objticket.region = Convert.ToString(dtStudentRecords.Rows[i][7]);
+                                //deposit slip column
+                                objticket.location = Convert.ToString(dtStudentRecords.Rows[i][8]);
+                                //solid column
+                                objticket.hublocation = Convert.ToString(dtStudentRecords.Rows[i][9]);
+                                objticket.emailfrom = Convert.ToString(dtStudentRecords.Rows[i][10]);
+                                objticket.emailsubject = Convert.ToString(dtStudentRecords.Rows[i][11]);
+                                objticket.emailcc = Convert.ToString(dtStudentRecords.Rows[i][12]);
+
                                 lstTicket.Add(objticket);
                             }
                         }
@@ -124,9 +208,10 @@ namespace FTWebApi.Controllers
 
 
         [HttpPost]
-        public HttpResponseMessage UploadBulkTickeClose()
+        //public HttpResponseMessage UploadBulkTickeClose()
+        public string UploadBulkTickeClose()
         {
-            HttpResponseMessage result = null;
+            //HttpResponseMessage result = null;
             var httpRequest = HttpContext.Current.Request;
             Stream FileStream = null;
             DataSet dsexcelRecords = new DataSet();
@@ -192,21 +277,49 @@ namespace FTWebApi.Controllers
                             }
                         }
 
-                        dalticketrepo.AddExcelCloseData(lstTicket, lsttd);
-                        result = Request.CreateResponse(HttpStatusCode.Created, docfiles);
+                        message = dalticketrepo.AddExcelCloseData(lstTicket, lsttd);
+
+                        if (message != "Close" && message != "Batch")
+                        {
+                            sendcloseemail(lstTicket);
+                        }
+
+
+                        //result = Request.CreateResponse(HttpStatusCode.Created, message);
                     }
                 }
             }
             else
             {
-                result = Request.CreateResponse(HttpStatusCode.BadRequest);
+                //result = Request.CreateResponse(HttpStatusCode.BadRequest);
             }
             FileStream.Close();
             //throw new HttpResponseException(response);
-            return result;
+            return message;
         }
 
+        public void sendcloseemail(List<FTWebApi.Models.Ticket> lstTicket)
+        {
+            //arvind
+            string sbatchid="";
+            string html = "";
+            FTWebApi.Models.Ticket objti;
+            foreach (var objticket in lstTicket)
+            {
+                if (sbatchid!= objticket.batchno)
+                {
+                    html = dalticketrepo.GenerateHtmlResponse(objticket);
 
+                    if (html != "notallclose")
+                    {
+                        objti = dalticketrepo.GetTicket(objticket.ticketno);
+
+                        sendemailcloseexcel(html, objti.emailfrom, objti.emailsubject, objti.batchno, objti.emailcc, objti.filename);
+                    }
+                }
+                sbatchid = objticket.batchno;
+            }
+        }
 
         public HttpResponseMessage Downloadnew(string filepath, string filname)
         {
@@ -404,16 +517,18 @@ namespace FTWebApi.Controllers
         {
             MailMessage message = new MailMessage();
             SmtpClient smtp = new SmtpClient();
-            message.From = new MailAddress("rcmuatquery@cms.com");
+            //message.From = new MailAddress("rcmuatquery@cms.com");
+            message.From = new MailAddress("rcm.opsquery@cms.com ");
             message.To.Add(new MailAddress("arvind.gavas@cms.com"));
             message.Subject = "RCMQuery TAT Eascalations";
             message.IsBodyHtml = true; //to make message body as html  
             message.Body = html;
             smtp.Port = 587;
             smtp.Host = "sampark.cms.com"; //for gmail host  
-            smtp.EnableSsl = true;
+            smtp.EnableSsl = false;
             smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            //smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            smtp.Credentials = new NetworkCredential("rcm.opsquery@cms.com", "Rcm@opq2021");
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
             smtp.Send(message);
         }
@@ -453,7 +568,8 @@ namespace FTWebApi.Controllers
         {
             MailMessage message = new MailMessage();
             SmtpClient smtp = new SmtpClient();
-            message.From = new MailAddress("rcmuatquery@cms.com");
+            //message.From = new MailAddress("rcmuatquery@cms.com");
+            message.From = new MailAddress("rcm.opsquery@cms.com");
             ///message.To.Add(new MailAddress(fromemailid));
             //message.To.Add(new MailAddress("arvind.gavas@cms.com"));
             message.Subject = "CMS Ticket Accptance Email";
@@ -461,9 +577,10 @@ namespace FTWebApi.Controllers
             message.Body = "CMS Ticket Accptance Email";
             smtp.Port = 587;
             smtp.Host = "sampark.cms.com"; //for gmail host  
-            smtp.EnableSsl = true;
+            smtp.EnableSsl = false;
             smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            //smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            smtp.Credentials = new NetworkCredential("rcm.opsquery@cms.com", "Rcm@opq2021");
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
             smtp.Send(message);
         }
@@ -474,7 +591,8 @@ namespace FTWebApi.Controllers
         public HttpResponseMessage sendlocationemail([FromBody] FTWebApi.Models.locemail objemail)
         {
 
-            string sfilepath = objemail.filepath.Replace("Z:/", @"https://cmsliveuat.cms.com/rcmquery/api/ticket/DownloadFile?filepath=//172.19.100.157/nfsrmsuat/");
+            //string sfilepath = objemail.filepath.Replace("Z:/", @"https://cmsliveuat.cms.com/rcmquery/api/ticket/DownloadFile?filepath=//172.19.100.157/nfsrmsuat/");
+            string sfilepath = objemail.filepath.Replace("Z:/", @"http://rcmquerylive.cms.com/rcmquery/api/ticket/DownloadFile?filepath=//rcmticketfsstoacc.file.core.windows.net/rcmticketfileshare/");
             string sfilename = "&filneame=EmailBody" + objemail.ticketno + ".html";
 
             //String sbody = @"https://cmsliveuat.cms.com/rcmquery/api/ticket/DownloadFile?filepath=\\172.19.100.157\nfsrmsuat\RCMEmail_Files\2021_06_25\EmailBody_2021-06-25_104528_799404.html&filneame=EmailBodyT000264.html";
@@ -483,28 +601,72 @@ namespace FTWebApi.Controllers
             StringBuilder msgbody= new StringBuilder();
             msgbody.Append("<html><head></head><body>Please click below link to download Email Body" + "<br />" + "<a href=" + sbody + ">EmailBody</a></body></html>");
 
+
+            if (objemail.emailattachment != "" && objemail.emailattachment != null)
+            {
+                //sfilepath = objemail.emailattachment.Replace("Z:/", @"https://cmsliveuat.cms.com/rcmquery/api/ticket/DownloadFile?filepath=//172.19.100.157/nfsrmsuat/");
+                sfilepath = objemail.emailattachment.Replace("Z:/", @"http://rcmquerylive.cms.com/rcmquery/api/ticket/DownloadFile?filepath=//rcmticketfsstoacc.file.core.windows.net/rcmticketfileshare/");
+                sfilename = "&filneame=Emailattachment" + objemail.ticketno + ".zip";
+                sbody = sfilepath + sfilename;
+                msgbody.Append("<html><head></head><body>Please click below link to download Email Attachemnt" + "<br />" + "<a href=" + sbody + ">Email Attachment</a></body></html>");
+            }
+            
+
+
             try
             {
-                MailMessage message = new MailMessage();
-                SmtpClient smtp = new SmtpClient();
-                message.From = new MailAddress("rcmuatquery@cms.com");
-                message.To.Add(new MailAddress(objemail.toemailid));   
-                if (objemail.ccemailid != null && objemail.ccemailid != "")
+                if (objemail.location)
                 {
-                    message.CC.Add(new MailAddress(objemail.ccemailid));
-                }    
-                message.Subject = objemail.emailsubject1;
-                message.IsBodyHtml = true; //to make message body as html  
-                message.Body = objemail.emailbody+ msgbody;
-                smtp.Port = 587;
-                smtp.Host = "sampark.cms.com"; //for gmail host  
-                smtp.EnableSsl = true;
-                smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
-                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-                smtp.Send(message);
 
-                dalticketrepo.updatemailhistory(objemail);
+                    MailMessage message = new MailMessage();
+                    SmtpClient smtp = new SmtpClient();
+                    //message.From = new MailAddress("rcmuatquery@cms.com");
+                    message.From = new MailAddress("rcm.opsquery@cms.com");
+                    message.To.Add(new MailAddress(objemail.toemailid));
+                    if (objemail.ccemailid != null && objemail.ccemailid != "")
+                    {
+                        string[] CCId = objemail.ccemailid.Split(',');
+
+                        foreach (string CCEmail in CCId)
+                        {
+                            message.CC.Add(new MailAddress(CCEmail));
+                        }
+                     
+                    }
+
+                    message.Subject = objemail.emailsubject1;
+                    message.Body = objemail.emailbody + msgbody;
+                    message.IsBodyHtml = true; //to make message body as html
+                   
+                    /*
+                    if (objemail.emailattachment != "" && objemail.emailattachment!=null)
+                    {
+                        sfilepath = "";
+                        sfilepath = objemail.emailattachment.Replace("Z:/", @"//172.19.100.157/nfsrmsuat/");
+
+                        //sfilepath = objemail.emailattachment.Replace("Z:/", @"Z:/");
+
+                        //string file = HttpContext.Current.Server.MapPath(sfilepath);
+                        message.Attachments.Add(new Attachment(sfilepath));
+                    }
+                    */
+                    smtp.Port = 587;
+                    smtp.Host = "sampark.cms.com"; //for gmail host  
+                    smtp.EnableSsl = false;
+                    smtp.UseDefaultCredentials = false;
+                    //smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+                    smtp.Credentials = new NetworkCredential("rcm.opsquery@cms.com", "Rcm@opq2021");
+                    smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    smtp.Send(message);
+
+                    dalticketrepo.updatemailhistory(objemail);
+                }
+                else
+                {
+                    dalticketrepo.UpdateTicketStatusClose(objemail.ticketno);
+                    sendmanualcloseresponse(objemail);
+                }
+                //sendemailcloseexcel(html, objticket.emailfrom, objticket.emailsubject, objticket.batchno, objticket.emailcc, objticket.filename);
 
             }
             catch (Exception e)
@@ -522,6 +684,24 @@ namespace FTWebApi.Controllers
 
         }
 
+        public void sendmanualcloseresponse(FTWebApi.Models.locemail objemail)
+        {
+            string html;
+            FTWebApi.Models.Ticket objticket;
+            objticket= dalticketrepo.GetTicket(objemail.ticketno);
+
+            if (objticket.status == "Close" )
+            {
+                html = dalticketrepo.GenerateHtmlResponse(objticket);
+
+                if (html != "notallclose")
+                {
+                    sendemailcloseexcelmanual(html, objemail.toemailid, objemail.emailsubject1, objticket.batchno, objemail.ccemailid, objticket.filename, objemail.emailbody,objemail.filepath);
+                }
+            }
+        }
+
+
         [HttpGet]
         public rcmdetail getcrnno(string customer, string pickupcode, string clientcode)
         {
@@ -532,6 +712,12 @@ namespace FTWebApi.Controllers
         public rcmdetail getrcmdata(string crnno, string clientcode)
         {
             return dalticketrepo.getrcmdata(crnno, clientcode);
+        }
+
+        [HttpGet]
+        public rcmdetail getrcmdatamanual(string crnno, string clientcode)
+        {
+            return dalticketrepo.getrcmdatamanual(crnno, clientcode);
         }
 
         [HttpGet]
@@ -594,6 +780,83 @@ namespace FTWebApi.Controllers
         }
 
         [HttpPut]
+        public HttpResponseMessage DeleteTicketAll([FromBody] FTWebApi.Models.Ticket[] objticketlst)
+        {
+            try
+            {
+
+                dalticketrepo.DeleteTicketAll(objticketlst);
+
+                var response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK
+                };
+
+                return response;
+
+            }
+            catch (Exception)
+            {
+                var response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+                return response;
+            }
+
+        }
+
+        [HttpGet]
+        public HttpResponseMessage UpdateTicketStatus(string ticketno)
+        {
+            try
+            {
+
+                dalticketrepo.UpdateTicketStatus(ticketno);
+
+                var response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK
+                };
+
+                return response;
+
+            }
+            catch (Exception)
+            {
+                var response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+                return response;
+            }
+
+        }
+
+
+        [HttpDelete]
+        public HttpResponseMessage DeleteTicket(string ticketno)
+        {
+            try
+            {
+                dalticketrepo.DeleteTicket(ticketno);
+                var response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.OK
+                };
+                return response;
+            }
+            catch (Exception)
+            {
+                var response = new HttpResponseMessage()
+                {
+                    StatusCode = HttpStatusCode.InternalServerError
+                };
+                return response;
+            }
+        }
+
+        [HttpPut]
         public HttpResponseMessage SendCloseResponse([FromBody] FTWebApi.Models.Ticket objticket)
         {
             string html;
@@ -603,7 +866,7 @@ namespace FTWebApi.Controllers
 
                 if (html != "notallclose")
                 {
-                    sendemailcloseexcel(html, objticket.emailfrom, objticket.emailsubject, objticket.batchno,objticket.emailcc);
+                    sendemailcloseexcel(html, objticket.emailfrom, objticket.emailsubject, objticket.batchno,objticket.emailcc,objticket.filename);
                 }
 
             }
@@ -635,7 +898,7 @@ namespace FTWebApi.Controllers
 
                     if (html != "notallclose")
                     {
-                        sendemailcloseexcel(html, objticket.emailfrom,objticket.emailsubject,objticket.batchno,objticket.emailcc);
+                        sendemailcloseexcel(html, objticket.emailfrom,objticket.emailsubject,objticket.batchno,objticket.emailcc,objticket.filename);
                     }
                 }
 
@@ -656,65 +919,183 @@ namespace FTWebApi.Controllers
         {
             MailMessage message = new MailMessage();
             SmtpClient smtp = new SmtpClient();
-            message.From = new MailAddress("rcmuatquery@cms.com");
+            //message.From = new MailAddress("rcmuatquery@cms.com");
+            message.From = new MailAddress("rcm.opsquery@cms.com");
             message.To.Add(new MailAddress(toemail));
             message.Subject = "Ticket Close Response";
             message.IsBodyHtml = true; //to make message body as html  
             message.Body = html;
             smtp.Port = 587;
             smtp.Host = "sampark.cms.com"; //for gmail host  
-            smtp.EnableSsl = true;
+            smtp.EnableSsl = false;
             smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            //smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            smtp.Credentials = new NetworkCredential("rcm.opsquery@cms.com", "Rcm@opq2021");
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
             smtp.Send(message);
         }
 
 
-        private void sendemailcloseexcel(string html, string toemail,string emailsubject,string batchno,string emailcc)
+        private void sendemailcloseexcelmanual(string html, string toemail, string emailsubject, string batchno, string emailcc, string filename,string emailbody,string filepath)
         {
             byte[] bytes = Encoding.ASCII.GetBytes(html);
             var stream = new MemoryStream(bytes);
 
-            /*
-            System.Net.Mime.ContentType ct = new System.Net.Mime.ContentType(System.Net.Mime.MediaTypeNames.Application.Octet);
-            System.Net.Mail.Attachment attach = new System.Net.Mail.Attachment(stream, ct);
-            attach.ContentDisposition.FileName = "ExcelResponse.xsl";
-            Response.ContentType = "application/x-msexcel"; 
-            Response.AddHeader("Content-Disposition", "attachment;
-            filename=ExcelFile.xls");
-            Response.ContentEncoding = Encoding.UTF8;
-            */
+            string msgsubject = "";
+            string msgbody = "";
 
+            msgsubject =  emailsubject;
+
+            //string sfilepath = @"F:\arvind\test\EmailBody_2021-06-25_104528_799404.html";
+            //string sfilepath = filepath.Replace("Z:/", @"//172.19.100.157/nfsrmsuat/");
+            
+            string sfilepath = filepath.Replace("Z:/", @"//rcmticketfsstoacc.file.core.windows.net/rcmticketfileshare/");
+            
+            string htmlText = System.IO.File.ReadAllText(sfilepath);
+
+            msgbody = emailbody;
+
+            MailMessage message = new MailMessage();
+
+            SmtpClient smtp = new SmtpClient();
+            //message.From = new MailAddress("rcmuatquery@cms.com");
+            
+            message.From = new MailAddress("rcm.opsquery@cms.com");
+
+            //message.To.Add(new MailAddress(toemail));
+            if (toemail != "" && toemail != null)
+            {
+                string[] CCId = toemail.Split(',');
+
+                foreach (string CCEmail in CCId)
+                {
+                    if (CCEmail != "")
+                    {
+                        message.To.Add(new MailAddress(CCEmail));
+                    }
+                }
+            }
+
+            if (emailcc != "" && emailcc != null)
+            {
+                string[] CCId = emailcc.Split(',');
+
+                foreach (string CCEmail in CCId)
+                {
+                    message.CC.Add(new MailAddress(CCEmail));   
+                }
+            }
+          
+            message.Subject = msgsubject;
+            message.IsBodyHtml = true; //to make message body as html  
+            
+
+            if (htmlText != null)
+            {
+                msgbody=msgbody.Replace("\n\n", "\n").Replace("\r\n", "\n").Replace("\n", "<br/><br/>");
+                msgbody = msgbody + "<br><br><hr>" +htmlText;
+            }
+
+            message.Body = msgbody;
+            
+            message.Attachments.Add(new Attachment(stream, "ExcelResponse.xls", "application/x-msexcel"));
+           
+            List<FTWebApi.Models.Ticket> tiicketlist = dalticketrepo.getticketsforbatch(batchno);
+
+           
+            foreach (var objticket in tiicketlist)
+            {
+                if (objticket.filename != "" && objticket.filename != null)
+                {
+                    string file = HttpContext.Current.Server.MapPath("~/uploadfiles/" + objticket.filename);
+                    message.Attachments.Add(new Attachment(file));
+                }
+                if (objticket.filename1 != "" && objticket.filename1 != null)
+                {
+                    string file = HttpContext.Current.Server.MapPath("~/uploadfiles/" + objticket.filename1);
+                    message.Attachments.Add(new Attachment(file));
+                }
+                if (objticket.filename2 != "" && objticket.filename2 != null)
+                {
+                    string file = HttpContext.Current.Server.MapPath("~/uploadfiles/" + objticket.filename2);
+                    message.Attachments.Add(new Attachment(file));
+                }
+            }
+           
+
+            smtp.Port = 587;
+            smtp.Host = "sampark.cms.com"; //for gmail host  
+            smtp.EnableSsl = false;
+            smtp.UseDefaultCredentials = false;
+            //smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            smtp.Credentials = new NetworkCredential("rcm.opsquery@cms.com", "Rcm@opq2021");
+            smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+            smtp.Send(message);
+            stream.Close();
+        }
+
+
+        private void sendemailcloseexcel(string html, string toemail,string emailsubject,string batchno,string emailcc,string filename)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(html);
+            var stream = new MemoryStream(bytes);
+          
             string msgsubject = "";
             string msgbody = "";
           
             msgsubject = "Closed-"+batchno + " " + emailsubject;
 
-            msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td>Your query has been closed vide batch no. " + batchno +
-                       " and detailed report attached for your quick reference. </td></tr><tr><td>Please note the interaction number for future reference.</tr></td><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td>Regards,</td></tr><tr><td>CMS Customer Service Team</td></tr></table>";
+            msgbody = "<table><tr><td>Dear Sir/Madam,</tr></td><tr><td></tr></td><tr><td>Your query has been closed vide batch no. " + batchno +
+                       " and detailed report attached for your quick reference. </td></tr><tr><td></tr></td><tr><td>Please note the interaction number for future reference.</tr></td><tr><td></tr></td><tr><td>This is an auto acknowledgement mail. Kindly do not reply to this mail.</td></tr><tr><td></tr></td><tr><td>Regards,</td></tr><tr><td></tr></td><tr><td>CMS Customer Service Team</td></tr></table>";
 
             MailMessage message = new MailMessage();
             SmtpClient smtp = new SmtpClient();
-            message.From = new MailAddress("rcmuatquery@cms.com");
+            //message.From = new MailAddress("rcmuatquery@cms.com");
+            message.From = new MailAddress("rcm.opsquery@cms.com");
             message.To.Add(new MailAddress(toemail));
-            
+
             if (emailcc != "" && emailcc != null)
             {
-                message.CC.Add(new MailAddress(emailcc));
+                string[] CCId = emailcc.Split(',');
+
+                foreach (string CCEmail in CCId)
+                {
+                    message.CC.Add(new MailAddress(CCEmail));
+                }
             }
 
             message.Subject = msgsubject;
             message.IsBodyHtml = true; //to make message body as html  
             message.Body = msgbody;
             message.Attachments.Add(new Attachment(stream, "ExcelResponse.xls", "application/x-msexcel"));
-            //message.Attachments.Add(new Attachment(stream, "ExcelResponse.xls", "application/vnd.ms-excel"));
-            //message.Attachments.Add(new Attachment(stream, "ExcelResponse.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+
+            List<FTWebApi.Models.Ticket> tiicketlist = dalticketrepo.getticketsforbatch(batchno);
+
+            foreach (var objticket in tiicketlist)
+            {
+                if (objticket.filename != "" && objticket.filename != null)
+                {
+                    string file = HttpContext.Current.Server.MapPath("~/uploadfiles/" + objticket.filename);
+                    message.Attachments.Add(new Attachment(file));
+                }
+                if (objticket.filename1 != "" && objticket.filename1 != null)
+                {
+                    string file = HttpContext.Current.Server.MapPath("~/uploadfiles/" + objticket.filename1);
+                    message.Attachments.Add(new Attachment(file));
+                }
+                if (objticket.filename2 != "" && objticket.filename2 != null)
+                {
+                    string file = HttpContext.Current.Server.MapPath("~/uploadfiles/" + objticket.filename2);
+                    message.Attachments.Add(new Attachment(file));
+                }
+            }
+
             smtp.Port = 587;
             smtp.Host = "sampark.cms.com"; //for gmail host  
-            smtp.EnableSsl = true;
+            smtp.EnableSsl = false;
             smtp.UseDefaultCredentials = false;
-            smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            //smtp.Credentials = new NetworkCredential("rcmuatquery@cms.com", "rcmu@T2021");
+            smtp.Credentials = new NetworkCredential("rcm.opsquery@cms.com", "Rcm@opq2021");
             smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
             smtp.Send(message);
             stream.Close();

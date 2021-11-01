@@ -26,7 +26,6 @@ namespace FTWebApi.Repository
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Batch> Batches { get; set; }
         public virtual DbSet<ErrorType> ErrorTypes { get; set; }
         public virtual DbSet<KeyGen> KeyGens { get; set; }
         public virtual DbSet<Ticket> Tickets { get; set; }
@@ -36,5 +35,6 @@ namespace FTWebApi.Repository
         public virtual DbSet<userbankmap> userbankmaps { get; set; }
         public virtual DbSet<usermaster> usermasters { get; set; }
         public virtual DbSet<LocationEmailHistory> LocationEmailHistories { get; set; }
+        public virtual DbSet<Batch> Batches { get; set; }
     }
 }

@@ -16,5 +16,6 @@ namespace FTWebApi.Repository
     {
         public int ID { get; set; }
         public string Bank { get; set; }
+        public string rcmbank { get; set; }
     }
 }

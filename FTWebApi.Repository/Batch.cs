@@ -27,5 +27,7 @@ namespace FTWebApi.Repository
         public string acceptstatus { get; set; }
         public string oldbatchid { get; set; }
         public string Emailcc { get; set; }
+        public string emailattachment { get; set; }
+        public string Emailto { get; set; }
     }
 }
